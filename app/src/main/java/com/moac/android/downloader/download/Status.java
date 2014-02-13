@@ -1,4 +1,4 @@
-package com.moac.android.downloader.service;
+package com.moac.android.downloader.download;
 
 public enum Status {
     CANCELLED,

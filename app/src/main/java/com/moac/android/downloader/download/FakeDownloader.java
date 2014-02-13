@@ -1,4 +1,4 @@
-package com.moac.android.downloader.request;
+package com.moac.android.downloader.download;
 
 import android.net.Uri;
 import android.util.Log;

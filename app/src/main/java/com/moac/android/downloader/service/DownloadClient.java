@@ -1,8 +1,7 @@
 package com.moac.android.downloader.service;
 
-import android.net.Uri;
-
-import com.moac.android.downloader.request.Request;
+import com.moac.android.downloader.download.Request;
+import com.moac.android.downloader.download.Status;
 
 import java.util.EnumSet;
 

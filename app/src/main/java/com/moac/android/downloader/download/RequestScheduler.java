@@ -1,13 +1,9 @@
-package com.moac.android.downloader.service;
+package com.moac.android.downloader.download;
 
 import android.os.Handler;
 import android.os.HandlerThread;
 import android.os.Message;
 import android.util.Log;
-
-import com.moac.android.downloader.request.Job;
-import com.moac.android.downloader.request.DownloaderFactory;
-import com.moac.android.downloader.request.Request;
 
 import java.util.concurrent.ExecutorService;
 

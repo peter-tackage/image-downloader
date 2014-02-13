@@ -1,6 +1,6 @@
 package com.moac.android.downloader;
 
-import com.moac.android.downloader.injection.AppModule;
+import com.moac.android.downloader.injection.FakeDownloadAppModule;
 import com.moac.android.downloader.injection.InjectingApplication;
 import com.moac.android.downloader.injection.Injector;
 
@@ -11,7 +11,7 @@ public class DownloaderTestApplication extends InjectingApplication implements I
     @Override
     public List<Object> getModules() {
         List<Object> modules = super.getModules();
-        modules.add(new AppModule(this));
+        modules.add(new FakeDownloadAppModule(this));
         return modules;
     }
 }

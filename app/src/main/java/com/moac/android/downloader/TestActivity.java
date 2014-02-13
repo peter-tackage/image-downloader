@@ -17,7 +17,7 @@ import android.widget.Switch;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.moac.android.downloader.request.Request;
+import com.moac.android.downloader.download.Request;
 import com.moac.android.downloader.service.DefaultDownloadClient;
 import com.moac.android.downloader.service.DownloadClient;
 import com.moac.android.downloader.service.DownloadService;

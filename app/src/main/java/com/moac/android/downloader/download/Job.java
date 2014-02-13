@@ -1,4 +1,4 @@
-package com.moac.android.downloader.request;
+package com.moac.android.downloader.download;
 
 /*
  * A runnable implementation that performs a download

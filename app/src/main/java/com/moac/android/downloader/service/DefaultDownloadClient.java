@@ -3,7 +3,9 @@ package com.moac.android.downloader.service;
 import android.os.Binder;
 import android.util.Log;
 
-import com.moac.android.downloader.request.Request;
+import com.moac.android.downloader.download.Request;
+import com.moac.android.downloader.download.RequestScheduler;
+import com.moac.android.downloader.download.Status;
 
 import java.util.EnumSet;
 

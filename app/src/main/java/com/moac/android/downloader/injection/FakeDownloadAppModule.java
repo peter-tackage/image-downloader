@@ -4,12 +4,12 @@ import android.os.IBinder;
 import android.util.Log;
 
 import com.moac.android.downloader.DownloaderTestApplication;
-import com.moac.android.downloader.request.Downloader;
-import com.moac.android.downloader.request.DownloaderFactory;
-import com.moac.android.downloader.request.FakeDownloader;
+import com.moac.android.downloader.download.Downloader;
+import com.moac.android.downloader.download.DownloaderFactory;
+import com.moac.android.downloader.download.FakeDownloader;
 import com.moac.android.downloader.service.DefaultDownloadClient;
 import com.moac.android.downloader.service.DownloadService;
-import com.moac.android.downloader.service.RequestScheduler;
+import com.moac.android.downloader.download.RequestScheduler;
 
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -17,12 +17,12 @@ import java.util.concurrent.Executors;
 import dagger.Provides;
 
 @dagger.Module(injects = {DownloaderTestApplication.class, DownloadService.class})
-public class AppModule {
-    private static final String TAG = AppModule.class.getSimpleName();
+public class FakeDownloadAppModule {
+    private static final String TAG = FakeDownloadAppModule.class.getSimpleName();
 
     private final DownloaderTestApplication mApplication;
 
-    public AppModule(DownloaderTestApplication application) {
+    public FakeDownloadAppModule(DownloaderTestApplication application) {
         mApplication = application;
     }
 
@@ -33,19 +33,20 @@ public class AppModule {
     }
 
     @Provides
-    ExecutorService provideRequestExecutor() {
-        Log.i(TAG, "Providing provideRequestExecutor");
-        // TODO Configure the queue size
+    ExecutorService provideExecutorService() {
+        Log.i(TAG, "Providing ExecutorService");
         return Executors.newFixedThreadPool(5);
     }
 
     @Provides
     RequestScheduler provideRequestScheduler(ExecutorService requestExecutor, DownloaderFactory factory) {
+        Log.i(TAG, "Providing RequestScheduler");
         return new RequestScheduler(requestExecutor, factory);
     }
 
     @Provides
-    DownloaderFactory provideDownloadFactory() {
+    DownloaderFactory provideDownloaderFactory() {
+        Log.i(TAG, "Providing DownloaderFactory");
         return new DownloaderFactory() {
             @Override
             public Downloader newInstance() {
