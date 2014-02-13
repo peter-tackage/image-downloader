@@ -13,6 +13,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
+import android.widget.Switch;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -27,6 +28,7 @@ public class TestActivity extends Activity {
     TextView mStatusTextView;
 
     private DownloadClient mDownloadClient;
+    private Switch mServiceSwitch;
     private ServiceConnection mConnection = new ServiceConnection() {
 
         private static final String TAG = "DownloadClientServiceConnection";
@@ -36,12 +38,16 @@ public class TestActivity extends Activity {
                                        IBinder service) {
             Log.i(TAG, "onServiceConnected() - client is now available");
             mDownloadClient = (DefaultDownloadClient) service;
+            mStatusTextView.setText("Client connected");
+            mServiceSwitch.setChecked(true);
         }
 
         @Override
         public void onServiceDisconnected(ComponentName arg0) {
             Log.i(TAG, "onServiceDisconnected() - client is NOT available");
             mDownloadClient = null;
+            mStatusTextView.setText("Client disconnected");
+            mServiceSwitch.setChecked(false);
         }
     };
 
@@ -49,10 +55,6 @@ public class TestActivity extends Activity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-
-        Intent intent = new Intent(this, DownloadService.class);
-        startService(intent);
-        bindService(intent, mConnection, Context.BIND_AUTO_CREATE);
 
         mSubmitButton = (Button) findViewById(R.id.button_submit);
         mSubmitButton.setOnClickListener(new View.OnClickListener() {
@@ -67,6 +69,11 @@ public class TestActivity extends Activity {
             }
         });
         mStatusTextView = (TextView) findViewById(R.id.textView_status);
+        mServiceSwitch = (Switch)findViewById(R.id.switch_service_control);
+
+        Intent intent = new Intent(this, DownloadService.class);
+        startService(intent);
+        bindService(intent, mConnection, Context.BIND_AUTO_CREATE);
     }
 
     @Override
