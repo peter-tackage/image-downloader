@@ -5,9 +5,8 @@ import android.os.HandlerThread;
 import android.os.Message;
 import android.util.Log;
 
-import com.moac.android.downloader.request.DownloadJob;
+import com.moac.android.downloader.request.Job;
 import com.moac.android.downloader.request.DownloaderFactory;
-import com.moac.android.downloader.request.FakeDownloader;
 import com.moac.android.downloader.request.Request;
 
 import java.util.concurrent.ExecutorService;
@@ -43,7 +42,7 @@ public class RequestScheduler {
                 switch (msg.what) {
                     case REQUEST_SUBMIT:
                         Log.i(TAG, "Creating download job");
-                        DownloadJob job = new DownloadJob((Request) msg.obj, factory.newInstance());
+                        Job job = new Job((Request) msg.obj, factory.newInstance());
                         // TODO Do something with the future
                         mRequestExecutor.submit(job);
                         break;
