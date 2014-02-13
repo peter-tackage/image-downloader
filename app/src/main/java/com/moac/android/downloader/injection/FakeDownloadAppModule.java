@@ -7,9 +7,9 @@ import com.moac.android.downloader.DownloaderTestApplication;
 import com.moac.android.downloader.download.Downloader;
 import com.moac.android.downloader.download.DownloaderFactory;
 import com.moac.android.downloader.download.FakeDownloader;
+import com.moac.android.downloader.download.Scheduler;
 import com.moac.android.downloader.service.DefaultDownloadClient;
 import com.moac.android.downloader.service.DownloadService;
-import com.moac.android.downloader.download.RequestScheduler;
 
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -27,9 +27,9 @@ public class FakeDownloadAppModule {
     }
 
     @Provides
-    IBinder provideDownloadClient(RequestScheduler requestScheduler) {
+    IBinder provideDownloadClient(Scheduler scheduler) {
         Log.i(TAG, "Providing download client binder");
-        return new DefaultDownloadClient(requestScheduler);
+        return new DefaultDownloadClient(scheduler);
     }
 
     @Provides
@@ -39,9 +39,9 @@ public class FakeDownloadAppModule {
     }
 
     @Provides
-    RequestScheduler provideRequestScheduler(ExecutorService requestExecutor, DownloaderFactory factory) {
-        Log.i(TAG, "Providing RequestScheduler");
-        return new RequestScheduler(requestExecutor, factory);
+    Scheduler provideRequestScheduler(ExecutorService requestExecutor, DownloaderFactory factory) {
+        Log.i(TAG, "Providing Scheduler");
+        return new Scheduler(requestExecutor, factory);
     }
 
     @Provides

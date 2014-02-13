@@ -10,25 +10,25 @@ import java.util.concurrent.ExecutorService;
 import javax.inject.Inject;
 
 /*
+ * Scheduler receives submitted download Request and
+ * dispatches them to a pool of executors as a Runnable Job
+ *
  * TODO Persistence and restart, status
  */
-public class RequestScheduler {
+public class Scheduler {
 
-    private static final String TAG = RequestScheduler.class.getSimpleName();
+    private static final String TAG = Scheduler.class.getSimpleName();
     private static final int REQUEST_SUBMIT = 1;
+    public static final String DOWNLOAD_DISPATCHER_THREAD_NAME = "DownloadDispatcher";
 
-    // Executor of Requests
     private final ExecutorService mRequestExecutor;
     private final Handler mDispatchHandler;
     private final HandlerThread mDispatchThread;
 
-    // Takes requests, queues them uses executor to determine
-    // when to unqueue and submit
     @Inject
-    public RequestScheduler(ExecutorService executor, final DownloaderFactory factory) {
+    public Scheduler(ExecutorService executor, final DownloaderFactory factory) {
         mRequestExecutor = executor;
-        // Create dispatch thread from background thread
-        mDispatchThread = new HandlerThread("DownloadDispatcher"
+        mDispatchThread = new HandlerThread(DOWNLOAD_DISPATCHER_THREAD_NAME
                 , android.os.Process.THREAD_PRIORITY_BACKGROUND);
         mDispatchThread.start();
         mDispatchHandler = new Handler(mDispatchThread.getLooper(), new Handler.Callback() {
@@ -55,15 +55,7 @@ public class RequestScheduler {
         mDispatchHandler.dispatchMessage(mDispatchHandler.obtainMessage(REQUEST_SUBMIT, request));
     }
 
-    public void start() {
-        // Start the executor
-        // Start the dispatcher
-        // TODO Um.... already started...
-    }
-
     public void stop() {
-        // Stop the dispatcher
-        // Stop the executor
         mDispatchThread.quit();
         mRequestExecutor.shutdown();
     }

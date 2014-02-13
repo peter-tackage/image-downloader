@@ -1,7 +1,7 @@
 package com.moac.android.downloader.download;
 
 /*
- * A runnable implementation that performs a download
+ * A Runnable implementation that performs a download Request
  */
 public class Job implements Runnable {
 
@@ -15,7 +15,7 @@ public class Job implements Runnable {
 
     @Override
     public void run() {
-        // TODO Set status
+        // TODO Set status, perhaps use a Future to informs of result.
         mDownloader.load(mRequest.getUri(), mRequest.getDestination());
     }
 }
