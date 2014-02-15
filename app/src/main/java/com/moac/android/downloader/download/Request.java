@@ -5,13 +5,12 @@ import android.net.Uri;
 /*
  * Describes a remote download request from perspective of a client
  *
- * TODO Add the ability to set HTTP header for authorized requests
  */
 public class Request {
 
     private final String mDestination;
     private final Uri mUri;
-    private Status mStatus;
+    private Status mStatus = Status.CREATED;
 
     public Request(Uri uri, String destination) {
         mUri = uri;
@@ -30,7 +29,7 @@ public class Request {
         return mStatus;
     }
 
-    public void setStatus(Status status) {
+    void setStatus(Status status) {
         mStatus = status;
     }
 

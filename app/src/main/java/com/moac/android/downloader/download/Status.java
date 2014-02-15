@@ -1,10 +1,11 @@
 package com.moac.android.downloader.download;
 
 public enum Status {
-    CANCELLED,
-    FAILED,
-    PAUSED,
+    CREATED,
     PENDING,
     RUNNING,
+    PAUSED,
+    CANCELLED,
     SUCCESSFUL,
+    FAILED,
 }

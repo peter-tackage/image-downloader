@@ -13,9 +13,10 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
-import android.widget.Switch;
+import android.widget.CompoundButton;
 import android.widget.TextView;
 import android.widget.Toast;
+import android.widget.ToggleButton;
 
 import com.moac.android.downloader.download.Request;
 import com.moac.android.downloader.service.DefaultDownloadClient;
@@ -24,11 +25,14 @@ import com.moac.android.downloader.service.DownloadService;
 
 public class TestActivity extends Activity {
 
+    private static final String TAG = TestActivity.class.getSimpleName();
+
     Button mSubmitButton;
     TextView mStatusTextView;
 
     private DownloadClient mDownloadClient;
-    private Switch mServiceSwitch;
+    private ToggleButton mServiceBindToggle;
+    private ToggleButton mServiceToggle;
     private ServiceConnection mConnection = new ServiceConnection() {
 
         private static final String TAG = "DownloadClientServiceConnection";
@@ -39,7 +43,8 @@ public class TestActivity extends Activity {
             Log.i(TAG, "onServiceConnected() - client is now available");
             mDownloadClient = (DefaultDownloadClient) service;
             mStatusTextView.setText("Client connected");
-            mServiceSwitch.setChecked(true);
+            mServiceBindToggle.setChecked(true);
+            mServiceToggle.setChecked(true);
         }
 
         @Override
@@ -47,7 +52,8 @@ public class TestActivity extends Activity {
             Log.i(TAG, "onServiceDisconnected() - client is NOT available");
             mDownloadClient = null;
             mStatusTextView.setText("Client disconnected");
-            mServiceSwitch.setChecked(false);
+            mServiceBindToggle.setChecked(false);
+            mServiceToggle.setChecked(false);
         }
     };
 
@@ -69,11 +75,32 @@ public class TestActivity extends Activity {
             }
         });
         mStatusTextView = (TextView) findViewById(R.id.textView_status);
-        mServiceSwitch = (Switch)findViewById(R.id.switch_service_control);
-
-        Intent intent = new Intent(this, DownloadService.class);
-        startService(intent);
-        bindService(intent, mConnection, Context.BIND_AUTO_CREATE);
+        mServiceBindToggle = (ToggleButton) findViewById(R.id.toggle_service_bind_btn);
+        mServiceBindToggle.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                if (isChecked) {
+                    Log.i(TAG, "Binding connection");
+                    bindService(new Intent(TestActivity.this, DownloadService.class), mConnection, Context.BIND_AUTO_CREATE);
+                } else {
+                    Log.i(TAG, "Unbinding connection");
+                    unbindService(mConnection);
+                }
+            }
+        });
+        mServiceToggle = (ToggleButton) findViewById(R.id.toggle_service_btn);
+        mServiceToggle.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                if (isChecked) {
+                    Log.i(TAG, "Starting service");
+                    startService(new Intent(TestActivity.this, DownloadService.class));
+                } else {
+                    Log.i(TAG, "Stopping service");
+                    stopService(new Intent(TestActivity.this, DownloadService.class));
+                }
+            }
+        });
     }
 
     @Override
@@ -97,7 +124,10 @@ public class TestActivity extends Activity {
 
     @Override
     protected void onDestroy() {
-        unbindService(mConnection);
+        /// FIXME Fails if not set
+        if (mConnection != null) {
+            unbindService(mConnection);
+        }
         super.onDestroy();
     }
 }

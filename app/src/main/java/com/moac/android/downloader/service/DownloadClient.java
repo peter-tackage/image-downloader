@@ -12,4 +12,11 @@ public interface DownloadClient {
 
     long[] getRequests(EnumSet<Status> statuses);
 
+    void addListener(DownloadListener listener);
+    void removeListener(DownloadListener listener);
+
+    public interface DownloadListener {
+        public void onDownloadEvent(Request request);
+    }
+
 }

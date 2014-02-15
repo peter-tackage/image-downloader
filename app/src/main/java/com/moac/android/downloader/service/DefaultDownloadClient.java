@@ -48,4 +48,14 @@ public class DefaultDownloadClient extends Binder implements DownloadClient {
         return new long[0];
     }
 
+    @Override
+    public void addListener(DownloadListener listener) {
+       mScheduler.addEventListener(listener);
+    }
+
+    @Override
+    public void removeListener(DownloadListener listener) {
+        mScheduler.removeEventListener(listener);
+    }
+
 }

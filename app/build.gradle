@@ -19,8 +19,6 @@ android {
 }
 
 dependencies {
-   // compile fileTree(dir: 'libs', include: ['*.jar', '*.aar'])
     compile 'com.squareup.dagger:dagger:1.2.0'
     compile 'com.squareup.dagger:dagger-compiler:1.2.0'
-    compile 'com.netflix.rxjava:rxjava-core:0.16.1'
 }

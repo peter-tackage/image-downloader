@@ -4,6 +4,7 @@ import android.content.Intent;
 import android.os.IBinder;
 import android.util.Log;
 
+import com.moac.android.downloader.download.Scheduler;
 import com.moac.android.downloader.injection.InjectingService;
 
 import java.util.concurrent.ExecutorService;
@@ -17,6 +18,9 @@ public class DownloadService extends InjectingService {
     @Inject
     IBinder mDownloadClientBinder;
 
+    @Inject
+    Scheduler mScheduler;
+
     @Override
     public void onCreate() {
         super.onCreate();
@@ -29,12 +33,17 @@ public class DownloadService extends InjectingService {
         return START_STICKY;
     }
 
-
-
     @Override
     public IBinder onBind(Intent intent) {
         // Return the DownloadClient implementation
         return mDownloadClientBinder;
+    }
+
+    @Override
+    public void onDestroy() {
+        Log.i(TAG, "onDestroy()");
+        mScheduler.stop();
+        super.onDestroy();
     }
 }
 

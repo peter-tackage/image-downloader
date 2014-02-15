@@ -20,9 +20,11 @@
             android:layout_width="200dp"
             android:layout_height="wrap_content"
             android:id="@+id/editText_command"
-            android:layout_alignParentTop="true"
-            android:layout_centerHorizontal="true"
-            android:layout_marginTop="54dp" />
+            android:layout_above="@+id/toggle_service_bind_btn"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentStart="true"
+            android:layout_marginBottom="24dp"
+            android:layout_toLeftOf="@+id/toggle_service_bind_btn" />
 
         <Button
             style="?android:attr/buttonStyleSmall"
@@ -30,17 +32,26 @@
             android:layout_height="wrap_content"
             android:text="@android:string/ok"
             android:id="@+id/button_submit"
-            android:layout_alignBottom="@+id/editText_command"
-            android:layout_toRightOf="@+id/editText_command" />
+            android:layout_alignTop="@+id/editText_command"
+            android:layout_centerHorizontal="true" />
 
-        <Switch
+        <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Service:"
-            android:id="@+id/switch_service_control"
+            android:textAppearance="?android:attr/textAppearanceMedium"
+            android:text="Service Bind:"
+            android:id="@+id/textView"
             android:layout_centerVertical="true"
             android:layout_alignParentLeft="true"
             android:layout_alignParentStart="true" />
+
+        <ToggleButton
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/toggle_service_bind_btn"
+            android:layout_centerVertical="true"
+            android:layout_alignLeft="@+id/toggle_service_btn"
+            android:layout_alignStart="@+id/toggle_service_btn" />
 
         <TextView
             android:layout_width="match_parent"
@@ -48,7 +59,26 @@
             android:textAppearance="?android:attr/textAppearanceMedium"
             android:hint="Waiting for service msg..."
             android:id="@+id/textView_status"
-            android:layout_below="@+id/switch_service_control"
+            android:layout_below="@+id/toggle_service_bind_btn"
+            android:layout_alignParentRight="true"
+            android:layout_alignParentEnd="true"
+            android:layout_marginTop="82dp" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textAppearance="?android:attr/textAppearanceMedium"
+            android:text="Service:"
+            android:id="@+id/textView"
+            android:layout_alignBottom="@+id/toggle_service_btn"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentStart="true" />
+
+        <ToggleButton
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/toggle_service_btn"
+            android:layout_below="@+id/toggle_service_bind_btn"
             android:layout_centerHorizontal="true" />
 
     </RelativeLayout>
