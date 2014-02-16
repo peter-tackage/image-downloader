@@ -1,6 +1,5 @@
 package com.moac.android.downloader;
 
-import com.moac.android.downloader.injection.FakeDownloadAppModule;
 import com.moac.android.downloader.injection.InjectingApplication;
 import com.moac.android.downloader.injection.Injector;
 

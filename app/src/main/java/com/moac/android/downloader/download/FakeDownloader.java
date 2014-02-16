@@ -6,10 +6,12 @@ import android.util.Log;
 import java.io.IOException;
 import java.util.concurrent.TimeUnit;
 
+/**
+ * A dummy downloader to test the service mechanisms
+ *
+ * Returns an empty input stream to be written to storage
+ */
 public class FakeDownloader implements Downloader {
-
-    public static final Uri FAILED_URI = Uri.parse("http://fail.com");
-    public static final Uri SUCCESS_URI = Uri.parse("http://success.com");
 
     private static final String TAG = FakeDownloader.class.getSimpleName();
 
@@ -20,7 +22,7 @@ public class FakeDownloader implements Downloader {
     }
 
     @Override
-    public Response load(Uri uri, String destination) throws IOException {
+    public NetworkResponse load(Uri uri, String destination) throws IOException {
         Log.i(TAG, "Fake downloading start: " + uri.toString()
                 + " to: " + destination
                 + " will take: " + mTimeInSeconds + " sec");
@@ -31,8 +33,7 @@ public class FakeDownloader implements Downloader {
             e.printStackTrace();
         }
         Log.i(TAG, "Fake downloading end: " + uri.toString());
-        Response response = new Response();
-        response.mIsSuccess = uri == SUCCESS_URI;
-        return response;
+        NetworkResponse networkResponse = new NetworkResponse(null, 0);
+        return networkResponse;
     }
 }

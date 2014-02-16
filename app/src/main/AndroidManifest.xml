@@ -3,6 +3,7 @@
     package="com.moac.android.downloader" >
 
     <uses-permission android:name="android.permission.INTERNET"/>
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
 
     <application
         android:allowBackup="true"
@@ -20,6 +21,7 @@
             </intent-filter>
         </activity>
         <service android:name=".service.DownloadService" android:enabled="true"
+            android:exported="false"
             android:permission="com.moac.android.DOWNLOAD_SERVICE_PERMISSION"/>
     </application>
 

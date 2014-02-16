@@ -8,6 +8,7 @@ import com.moac.android.downloader.download.Scheduler;
 import com.moac.android.downloader.download.Status;
 
 import java.util.EnumSet;
+import java.util.UUID;
 
 import javax.inject.Inject;
 
@@ -38,4 +39,8 @@ public class DefaultDownloadClient extends Binder implements DownloadClient {
         return mScheduler.getStatus(id);
     }
 
+    @Override
+    public String generateNextId() {
+        return UUID.randomUUID().toString();
+    }
 }

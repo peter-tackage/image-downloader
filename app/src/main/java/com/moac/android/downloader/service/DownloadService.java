@@ -17,6 +17,8 @@ public class DownloadService extends InjectingService {
     public static final String STATUS_EVENTS = "com.moac.android.downloader.STATUS_EVENTS";
     public static final String DOWNLOAD_ID = "com.moac.android.downloader.DOWNLOAD_ID";
     public static final String STATUS = "com.moac.android.downloader.STATUS";
+    public static final String REMOTE_LOCATION = "com.moac.android.downloader.REMOTE_LOCATION";
+    public static final String LOCAL_LOCATION = "com.moac.android.downloader.LOCAL_LOCATION";
 
     // Service actions
     public static final int REQUEST_SUBMIT = 1;
@@ -38,12 +40,13 @@ public class DownloadService extends InjectingService {
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
         Log.i(TAG, "onStartCommand() - intent: " + intent);
-        // FIXME Destination, STICKY IS WRONG
-        String downloadId = intent.getStringExtra(DOWNLOAD_ID);
-        Uri uri = intent.getData();
-        String destination = "nowhere";
-        mScheduler.submit(new Request(downloadId, uri, destination));
-        return START_STICKY;
+        if (intent != null) {
+            String downloadId = intent.getStringExtra(DOWNLOAD_ID);
+            String remoteLocation = intent.getStringExtra(REMOTE_LOCATION);
+            String localLocation = intent.getStringExtra(LOCAL_LOCATION);
+            mScheduler.submit(new Request(downloadId, Uri.parse(remoteLocation), localLocation));
+        }
+        return START_NOT_STICKY;
     }
 
     @Override
@@ -58,4 +61,3 @@ public class DownloadService extends InjectingService {
         super.onDestroy();
     }
 }
-

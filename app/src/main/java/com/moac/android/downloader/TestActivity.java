@@ -9,7 +9,9 @@ import android.content.IntentFilter;
 import android.content.ServiceConnection;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.Environment;
 import android.os.IBinder;
+import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
@@ -18,6 +20,7 @@ import com.moac.android.downloader.download.Status;
 import com.moac.android.downloader.service.DownloadClient;
 import com.moac.android.downloader.service.DownloadService;
 
+import java.io.File;
 import java.util.ArrayList;
 
 /*
@@ -116,7 +119,6 @@ public class TestActivity extends Activity {
             @Override
             public void onClick(View v) {
                 if (mIsBound) {
-                    // TODO For simplicity, just use the URL as the tracking id.
                     String uriId = (String) v.getTag();
                     if (mSubmittedDownloads.contains(uriId)) {
                         mDownloadClient.cancel(uriId);
@@ -124,7 +126,8 @@ public class TestActivity extends Activity {
                         Intent i = new Intent(TestActivity.this, DownloadService.class);
                         Uri uri = Uri.parse(uriId);
                         i.putExtra(DownloadService.DOWNLOAD_ID, uriId);
-                        i.setData(uri);
+                        i.putExtra(DownloadService.REMOTE_LOCATION, uri.toString());
+                        i.putExtra(DownloadService.LOCAL_LOCATION, makeTestFile());
                         startService(i);
                     }
                 }
@@ -135,7 +138,7 @@ public class TestActivity extends Activity {
     @Override
     protected void onResume() {
         super.onResume();
-        registerReceiver(mStatusReceiver, new IntentFilter(DownloadService.STATUS_EVENTS));
+        LocalBroadcastManager.getInstance(this).registerReceiver(mStatusReceiver, new IntentFilter(DownloadService.STATUS_EVENTS));
         Intent intent = new Intent(this, DownloadService.class);
         bindService(intent, mConnection,
                 Context.BIND_AUTO_CREATE);
@@ -148,7 +151,7 @@ public class TestActivity extends Activity {
             unbindService(mConnection);
             mIsBound = false;
         }
-        unregisterReceiver(mStatusReceiver);
+        LocalBroadcastManager.getInstance(this).unregisterReceiver(mStatusReceiver);
     }
 
     @Override
@@ -170,11 +173,16 @@ public class TestActivity extends Activity {
             if (bundle != null) {
                 String downloadId = bundle.getString(DownloadService.DOWNLOAD_ID);
                 Status status = (Status) bundle.get(DownloadService.STATUS);
-                Log.i(TAG, "Received event for downloadId: " + downloadId);
-                Log.i(TAG, "Received event for status: " + status);
-                // TODO Update the status, remove progress
+                Log.i(TAG, "Received event for downloadId: " + downloadId + " status: " + status);
                 onRequestStatusChanged(downloadId, status);
             }
         }
     };
+
+    private String makeTestFile() {
+        File path = Environment.getExternalStoragePublicDirectory(
+                Environment.DIRECTORY_PICTURES);
+        File file = new File(path, "DemoPicture1-"+System.currentTimeMillis()+".jpg");
+        return file.toString();
+    }
 }

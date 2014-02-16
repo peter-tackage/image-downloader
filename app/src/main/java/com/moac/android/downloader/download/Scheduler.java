@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.os.Handler;
 import android.os.HandlerThread;
 import android.os.Message;
+import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
 
 import com.moac.android.downloader.service.DownloadService;
@@ -38,7 +39,7 @@ public class Scheduler implements StatusHandler {
     private Map<String, Status> mStatusMap = new HashMap<String, Status>();
 
     public Scheduler(Context context, ExecutorService executor, DownloaderFactory downloaderFactory) {
-        Log.i(TAG, "Creating scheduler");
+        Log.i(TAG, "Creating Scheduler");
         mContext = context;
         mRequestExecutor = executor;
         mDownloaderFactory = downloaderFactory;
@@ -48,7 +49,7 @@ public class Scheduler implements StatusHandler {
         mDispatchHandler = new Handler(mDispatchThread.getLooper(), new Handler.Callback() {
             @Override
             public boolean handleMessage(Message msg) {
-                Log.i(TAG, "Handling msg on Thread: " + Thread.currentThread());
+                Log.i(TAG, "Handling msg on Dispatch Thread: " + Thread.currentThread());
                 switch (msg.what) {
                     case DownloadService.REQUEST_SUBMIT:
                         Request request = (Request)msg.obj;
@@ -79,23 +80,18 @@ public class Scheduler implements StatusHandler {
     @Override
     public void handleStatusChanged(Request request, Status status) {
         Log.i(TAG, "handleStatusChanged() Request: " + request.getUri() + " is now: " + status);
-        Log.i(TAG, "handleStatusChanged() Thread: " + Thread.currentThread());
-        Log.i(TAG, "handleStatusChanged() Scheduler: " + this);
         mStatusMap.put(request.getId(), status);
         Intent intent = new Intent(DownloadService.STATUS_EVENTS);
         intent.putExtra(DownloadService.DOWNLOAD_ID, request.getId());
         intent.putExtra(DownloadService.STATUS, status);
-        mContext.sendBroadcast(intent);
+        LocalBroadcastManager.getInstance(mContext).sendBroadcast(intent);
     }
 
     public void cancel(String id) {
-        // TODO
+        // TODO Cancel Job, remove.
     }
 
     public Status getStatus(String id) {
-        Log.i(TAG, "getStatus map: " + mStatusMap);
-        Log.i(TAG, "getStatus map: " + mStatusMap.hashCode());
-        Log.i(TAG, "getStatus Scheduler: " + this);
         Status status = mStatusMap.get(id);
         return status == null ? Status.UNKNOWN : status;
     }

@@ -14,5 +14,5 @@ import java.io.IOException;
  *
  */
 public interface Downloader {
-    Response load(Uri uri, String destination) throws IOException;
+    NetworkResponse load(Uri uri, String destination) throws IOException;
 }
