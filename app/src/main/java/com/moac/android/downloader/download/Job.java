@@ -25,11 +25,15 @@ class Job implements Runnable {
     public void run() {
         Log.i(TAG, "Job being run on thread: " + Thread.currentThread());
         try {
-            mStatusHandler.postStatusChanged(mRequest, Status.RUNNING);
+            sendStatus(Status.RUNNING);
             mDownloader.load(mRequest.getUri(), mRequest.getDestination());
-            mStatusHandler.postStatusChanged(mRequest, Status.SUCCESSFUL);
+            sendStatus(Status.SUCCESSFUL);
         } catch (IOException e) {
-            mStatusHandler.postStatusChanged(mRequest, Status.FAILED);
+            sendStatus(Status.FAILED);
         }
+    }
+
+    private void sendStatus(Status status) {
+        mStatusHandler.handleStatusChanged(mRequest, status);
     }
 }

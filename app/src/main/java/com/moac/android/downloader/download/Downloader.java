@@ -12,7 +12,6 @@ import java.io.IOException;
  * the ability to add any required request headers for downloads requiring
  * authorization.
  *
- * TODO This should return a result
  */
 public interface Downloader {
     Response load(Uri uri, String destination) throws IOException;

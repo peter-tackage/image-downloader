@@ -12,12 +12,8 @@ import java.util.EnumSet;
 import javax.inject.Inject;
 
 /*
- * Real implementation of the DownloadClient, submits Requests
- * to be scheduled for download.
- *
- * TODO Have a way of cancelling jobs
- * TOOD GetRequests
- *
+ * Real implementation of the DownloadClient, most actions are
+ * proxied through to the Scheduler.
  */
 public class DefaultDownloadClient extends Binder implements DownloadClient {
 
@@ -32,30 +28,14 @@ public class DefaultDownloadClient extends Binder implements DownloadClient {
     }
 
     @Override
-    public long download(Request request) {
-        Log.i(TAG, "Enqueueing request: " + request.getUri());
-        mScheduler.submit(request);
-        return -1;
-    }
-
-    @Override
-    public void cancel(long id) {
+    public void cancel(String id) {
         Log.i(TAG, "Cancelling download Id: " + id);
+        mScheduler.cancel(id);
     }
 
     @Override
-    public long[] getRequests(EnumSet<Status> statuses) {
-        return new long[0];
-    }
-
-    @Override
-    public void addListener(DownloadListener listener) {
-       mScheduler.addEventListener(listener);
-    }
-
-    @Override
-    public void removeListener(DownloadListener listener) {
-        mScheduler.removeEventListener(listener);
+    public Status getStatus(String id) {
+        return mScheduler.getStatus(id);
     }
 
 }

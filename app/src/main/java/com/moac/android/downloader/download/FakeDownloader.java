@@ -23,7 +23,7 @@ public class FakeDownloader implements Downloader {
     public Response load(Uri uri, String destination) throws IOException {
         Log.i(TAG, "Fake downloading start: " + uri.toString()
                 + " to: " + destination
-                + " will take:" + mTimeInSeconds + " sec");
+                + " will take: " + mTimeInSeconds + " sec");
         try {
             Thread.sleep(TimeUnit.SECONDS.toMillis(mTimeInSeconds));
         } catch (InterruptedException e) {

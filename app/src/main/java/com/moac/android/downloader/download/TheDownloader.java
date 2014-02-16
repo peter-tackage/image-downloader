@@ -11,6 +11,9 @@ import com.moac.android.downloader.service.DefaultDownloadClient;
 import com.moac.android.downloader.service.DownloadClient;
 import com.moac.android.downloader.service.DownloadService;
 
+/**
+ * An unfinished idea.
+ */
 public class TheDownloader {
 
     private TheDownloader() {};

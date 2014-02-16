@@ -1,85 +1,56 @@
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/container"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context="com.moac.android.downloader.TestActivity"
     tools:ignore="MergeRootFrame">
 
-    <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-        xmlns:tools="http://schemas.android.com/tools"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:paddingLeft="@dimen/activity_horizontal_margin"
-        android:paddingRight="@dimen/activity_horizontal_margin"
-        android:paddingTop="@dimen/activity_vertical_margin"
-        android:paddingBottom="@dimen/activity_vertical_margin"
-        tools:context="com.moac.android.downloader.TestActivity$PlaceholderFragment">
+    <FrameLayout
+        android:id="@+id/vg_demo_pic1"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:layout_gravity="center_horizontal">
 
-        <EditText
-            android:layout_width="200dp"
-            android:layout_height="wrap_content"
-            android:id="@+id/editText_command"
-            android:layout_above="@+id/toggle_service_bind_btn"
-            android:layout_alignParentLeft="true"
-            android:layout_alignParentStart="true"
-            android:layout_marginBottom="24dp"
-            android:layout_toLeftOf="@+id/toggle_service_bind_btn" />
-
-        <Button
-            style="?android:attr/buttonStyleSmall"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@android:string/ok"
-            android:id="@+id/button_submit"
-            android:layout_alignTop="@+id/editText_command"
-            android:layout_centerHorizontal="true" />
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:textAppearance="?android:attr/textAppearanceMedium"
-            android:text="Service Bind:"
-            android:id="@+id/textView"
-            android:layout_centerVertical="true"
-            android:layout_alignParentLeft="true"
-            android:layout_alignParentStart="true" />
-
-        <ToggleButton
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:id="@+id/toggle_service_bind_btn"
-            android:layout_centerVertical="true"
-            android:layout_alignLeft="@+id/toggle_service_btn"
-            android:layout_alignStart="@+id/toggle_service_btn" />
-
-        <TextView
+        <ImageView
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:textAppearance="?android:attr/textAppearanceMedium"
-            android:hint="Waiting for service msg..."
-            android:id="@+id/textView_status"
-            android:layout_below="@+id/toggle_service_bind_btn"
-            android:layout_alignParentRight="true"
-            android:layout_alignParentEnd="true"
-            android:layout_marginTop="82dp" />
+            android:layout_height="match_parent"
+            android:id="@+id/iv_demo_pic1"
+            android:src="@drawable/demo_pic1"
+            android:scaleType="centerCrop" />
 
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:textAppearance="?android:attr/textAppearanceMedium"
-            android:text="Service:"
-            android:id="@+id/textView"
-            android:layout_alignBottom="@+id/toggle_service_btn"
-            android:layout_alignParentLeft="true"
-            android:layout_alignParentStart="true" />
+        <FrameLayout
+            android:id="@+id/vg_progress_indicator"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="#AA000000"
+            android:visibility="gone">
 
-        <ToggleButton
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:id="@+id/toggle_service_btn"
-            android:layout_below="@+id/toggle_service_bind_btn"
-            android:layout_centerHorizontal="true" />
+            <ProgressBar
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:indeterminate="true"
+                android:layout_gravity="center" />
+        </FrameLayout>
+    </FrameLayout>
 
-    </RelativeLayout>
-</FrameLayout>
+    <!--<FrameLayout-->
+    <!--android:layout_width="wrap_content"-->
+    <!--android:layout_height="wrap_content"-->
+    <!--android:id="@+id/vg_demo_pic2"-->
+    <!--android:layout_weight="1"-->
+    <!--android:layout_margin="4dp">-->
+
+    <!--<ImageView-->
+    <!--android:layout_width="wrap_content"-->
+    <!--android:layout_height="wrap_content"-->
+    <!--android:id="@+id/iv_demo_pic2"-->
+    <!--android:layout_marginTop="41dp"-->
+    <!--android:src="@drawable/demo_pic2"/>-->
+    <!--<ProgressBar-->
+    <!--android:layout_width="match_parent"-->
+    <!--android:layout_height="match_parent"-->
+    <!--android:indeterminate="true"/>-->
+    <!--</FrameLayout>-->
+
+</LinearLayout>
