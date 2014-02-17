@@ -3,12 +3,14 @@ package com.moac.android.downloader.service;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.IBinder;
+import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
 
 import com.moac.android.downloader.download.DownloaderFactory;
 import com.moac.android.downloader.download.Request;
 import com.moac.android.downloader.download.RequestStore;
 import com.moac.android.downloader.download.Scheduler;
+import com.moac.android.downloader.download.Status;
 import com.moac.android.downloader.download.StatusHandler;
 import com.moac.android.downloader.injection.InjectingService;
 
@@ -48,7 +50,7 @@ public class DownloadService extends InjectingService {
     @Override
     public void onCreate() {
         super.onCreate();
-        mStatusHandler = new StatusHandler(this, mRequestStore);
+        mStatusHandler = new StatusHandler(LocalBroadcastManager.getInstance(this), mRequestStore);
         mScheduler = new Scheduler(mStatusHandler, mExecutor, mDownloaderFactory);
         mDownloadClient = new DefaultDownloadClient(mRequestStore, mStatusHandler);
     }
@@ -60,10 +62,19 @@ public class DownloadService extends InjectingService {
             String downloadId = intent.getStringExtra(DOWNLOAD_ID);
             String remoteLocation = intent.getStringExtra(REMOTE_LOCATION);
             String localLocation = intent.getStringExtra(LOCAL_LOCATION);
-            // TODO Check if it is running being processed or has finished
-            Request request = mRequestStore.create(downloadId, Uri.parse(remoteLocation), localLocation);
-            mScheduler.submit(request);
+
+            // Don't allow multiple in-progress requests with the same download id
+            Request request = mRequestStore.getRequest(downloadId);
+            if (request != null) {
+                if (mStatusHandler.moveToStatus(downloadId, Status.CREATED)) {
+                    mScheduler.submit(request);
+                }
+            } else {
+                request = mRequestStore.create(downloadId, Uri.parse(remoteLocation), localLocation);
+                mScheduler.submit(request);
+            }
         }
+
         return START_NOT_STICKY;
     }
 

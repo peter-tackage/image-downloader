@@ -1,6 +1,5 @@
 package com.moac.android.downloader.download;
 
-import android.content.Context;
 import android.content.Intent;
 import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
@@ -9,40 +8,54 @@ import com.moac.android.downloader.service.DownloadService;
 
 public class StatusHandler {
 
-    private final Context mContext;
+    private static final String TAG = StatusHandler.class.getSimpleName();
+
+    private final LocalBroadcastManager mLocalBroadCastManager;
     private final RequestStore mRequestStore;
 
-    public StatusHandler(Context context, RequestStore requestStore) {
-        mContext = context;
+    public StatusHandler(LocalBroadcastManager localBroadcastManager, RequestStore requestStore) {
+        mLocalBroadCastManager = localBroadcastManager;
         mRequestStore = requestStore;
     }
 
-    private static final String TAG = StatusHandler.class.getSimpleName();
-
+    // Return true if the request support move is possible
     public boolean moveToStatus(String id, Status toStatus) {
-        // If can move return true, otherwise false.
-        // Cannot transition from Cancelled, Successful or Failed
-        Log.i(TAG, "Attempting to move id: " + id + " to: " + toStatus);
         Status currentStatus = mRequestStore.getStatus(id);
-        Log.i(TAG, "Current status of id: " + id + " to: " + currentStatus);
+        Log.i(TAG, "moveToStatus() - Attempting to move id: " + id + " from: " + currentStatus + " => " + toStatus);
+        boolean isMoveAllowed = false;
         switch (currentStatus) {
             case UNKNOWN:
             case CANCELLED:
             case SUCCESSFUL:
             case FAILED:
-                return false;
+                // Support a restart from a finished state or rewriting of finished state
+                isMoveAllowed = toStatus != Status.PENDING && toStatus != Status.RUNNING;
+                break;
+            case CREATED:
+            case PENDING:
+            case RUNNING:
+                // Don't support move back for an in-progress request
+                isMoveAllowed = toStatus.ordinal() > currentStatus.ordinal();
+                break;
             default:
-                Request request = mRequestStore.getRequest(id);
-                request.setStatus(toStatus);
-                notifyStateChanged(id, toStatus);
-                return true;
+                throw new IllegalStateException("Unhandled request state: " + currentStatus);
         }
+        if (isMoveAllowed) {
+            setAndNotifyStateChanged(id, toStatus);
+        }
+        Log.i(TAG, "moveToStatus() - isMoveAllowed: " + isMoveAllowed);
+        return isMoveAllowed;
     }
 
-    private void notifyStateChanged(String id, Status status) {
-        Intent intent = new Intent(DownloadService.STATUS_EVENTS);
-        intent.putExtra(DownloadService.DOWNLOAD_ID, id);
-        intent.putExtra(DownloadService.STATUS, status);
-        LocalBroadcastManager.getInstance(mContext).sendBroadcast(intent);
+    private void setAndNotifyStateChanged(String id, Status toStatus) {
+        Request request = mRequestStore.getRequest(id);
+        request.setStatus(toStatus);
+        // Notify via Localbroadcast
+        if (mLocalBroadCastManager != null) {
+            Intent intent = new Intent(DownloadService.STATUS_EVENTS);
+            intent.putExtra(DownloadService.DOWNLOAD_ID, id);
+            intent.putExtra(DownloadService.STATUS, toStatus);
+            mLocalBroadCastManager.sendBroadcast(intent);
+        }
     }
 }

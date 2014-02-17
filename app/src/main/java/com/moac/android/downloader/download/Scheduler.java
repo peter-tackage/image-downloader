@@ -1,20 +1,13 @@
 package com.moac.android.downloader.download;
 
-import android.content.Context;
-import android.content.Intent;
 import android.os.Handler;
 import android.os.HandlerThread;
 import android.os.Message;
-import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
 
 import com.moac.android.downloader.service.DownloadService;
 
-import java.util.HashMap;
-import java.util.Map;
 import java.util.concurrent.ExecutorService;
-
-import javax.inject.Inject;
 
 /*
  * Scheduler receives submitted download Request and
@@ -26,8 +19,7 @@ import javax.inject.Inject;
 public class Scheduler {
 
     private static final String TAG = Scheduler.class.getSimpleName();
-
-    public static final String DOWNLOAD_DISPATCHER_THREAD_NAME = "DownloadDispatcher";
+    private static final String DOWNLOAD_DISPATCHER_THREAD_NAME = "DownloadDispatcher";
 
     private final ExecutorService mRequestExecutor;
     private final DownloaderFactory mDownloaderFactory;
