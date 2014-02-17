@@ -74,8 +74,7 @@ public class DownloadService extends InjectingService {
                 mScheduler.submit(request);
             }
         }
-
-        return START_NOT_STICKY;
+        return START_STICKY;
     }
 
     @Override

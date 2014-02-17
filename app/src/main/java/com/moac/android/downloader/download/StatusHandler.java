@@ -22,7 +22,7 @@ public class StatusHandler {
     public boolean moveToStatus(String id, Status toStatus) {
         Status currentStatus = mRequestStore.getStatus(id);
         Log.i(TAG, "moveToStatus() - Attempting to move id: " + id + " from: " + currentStatus + " => " + toStatus);
-        boolean isMoveAllowed = false;
+        boolean isMoveAllowed;
         switch (currentStatus) {
             case UNKNOWN:
             case CANCELLED:

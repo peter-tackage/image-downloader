@@ -14,7 +14,6 @@ import java.util.concurrent.ExecutorService;
  * dispatches them to a pool of executors as a Runnable Job
  *
  * TODO Persistence and restart, status
- * TODO Prevent duplicate download attempts
  */
 public class Scheduler {
 

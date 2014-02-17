@@ -11,6 +11,7 @@ public class FileWriter {
     public void write(InputStream inputStream, String fileDestination, long contentLength) throws IOException {
 
         File output = new File(fileDestination);
+        output.mkdirs();
         if (output.exists() && output.isFile()) {
             output.delete();
         }
