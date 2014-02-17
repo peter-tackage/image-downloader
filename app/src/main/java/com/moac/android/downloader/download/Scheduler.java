@@ -33,11 +33,11 @@ public class Scheduler {
     private final DownloaderFactory mDownloaderFactory;
     private final Handler mDispatchHandler;
     private final HandlerThread mDispatchThread;
-    private final RequestStore mRequestStore;
+    private final StatusHandler mStatusHandler;
 
-    public Scheduler(RequestStore requestStore, ExecutorService executor, DownloaderFactory downloaderFactory) {
+    public Scheduler(StatusHandler statusHandler, ExecutorService executor, DownloaderFactory downloaderFactory) {
         Log.i(TAG, "Creating Scheduler");
-        mRequestStore = requestStore;
+        mStatusHandler = statusHandler;
         mRequestExecutor = executor;
         mDownloaderFactory = downloaderFactory;
         mDispatchThread = new HandlerThread(DOWNLOAD_DISPATCHER_THREAD_NAME
@@ -50,9 +50,9 @@ public class Scheduler {
                 switch (msg.what) {
                     case DownloadService.REQUEST_SUBMIT:
                         Request request = (Request) msg.obj;
-                        if (mRequestStore.moveToStatus(request.getId(), Status.PENDING)) {
+                        if (mStatusHandler.moveToStatus(request.getId(), Status.PENDING)) {
                             Log.i(TAG, "Creating download job for id: " + request.getId());
-                            Job job = new Job(request, mDownloaderFactory.newInstance(), mRequestStore);
+                            Job job = new Job(request, mDownloaderFactory.newInstance(), mStatusHandler);
                             mRequestExecutor.submit(job);
                         }
                         break;

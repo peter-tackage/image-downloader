@@ -2,11 +2,7 @@ package com.moac.android.downloader.download;
 
 import android.util.Log;
 
-import java.io.BufferedOutputStream;
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
+import java.io.*;
 
 /*
  * A Runnable implementation that performs a download Request
@@ -17,19 +13,18 @@ class Job implements Runnable {
 
     private final Downloader mDownloader;
     private final Request mRequest;
-    private final RequestStore mRequestStore;
+    private final StatusHandler mStatusHandler;
 
-    public Job(Request request, Downloader downloader, RequestStore requestStore) {
+    public Job(Request request, Downloader downloader, StatusHandler statusHandler) {
         mRequest = request;
         mDownloader = downloader;
-        mRequestStore = requestStore;
+        mStatusHandler = statusHandler;
     }
 
     @Override
     public void run() {
         Log.i(TAG, "Job being run on thread: " + Thread.currentThread());
         InputStream is = null;
-        BufferedOutputStream fos = null;
         try {
             moveToStatus(Status.RUNNING);
             NetworkResponse networkResponse = mDownloader.load(mRequest.getUri(), mRequest.getDestination());
@@ -45,38 +40,26 @@ class Job implements Runnable {
                 moveToStatus(Status.FAILED);
                 return;
             }
-
             Log.i(TAG, "Network response was: " + networkResponse.getContentLength());
 
-            File output=new File(mRequest.getDestination());
-            if (output.exists() && output.isFile()) {
-                output.delete();
-            }
+            // Write stream to output destination file
+            FileWriter writer = new FileWriter();
+            writer.write(is, mRequest.getDestination(), networkResponse.getContentLength());
 
-            fos = new BufferedOutputStream(new FileOutputStream(output.getPath()));
-            final int BUFFER_SIZE = 4096;
-            byte[] buffer = new byte[BUFFER_SIZE];
-            int totalBytesRead = 0;
-            int bytesRead;
-            while ((bytesRead = is.read(buffer)) != -1) {
-                fos.write(buffer, 0, bytesRead);
-                totalBytesRead+=bytesRead;
-            }
-            if(totalBytesRead < networkResponse.getContentLength()) {
-                Log.e(TAG, "Got " + bytesRead + " was expecting " + networkResponse.getContentLength());
-                moveToStatus(Status.FAILED);
-                return;
-            }
+            // We finished without error
             moveToStatus(Status.SUCCESSFUL);
+
         } catch (IOException e) {
+            Log.e(TAG, String.format("Failed to complete download of %s to %s",
+                    mRequest.getUri().toString(), mRequest.getDestination()), e);
             moveToStatus(Status.FAILED);
         } finally {
             Utils.closeQuietly(is);
-            Utils.closeQuietly(fos);
         }
     }
 
+    // Shorthand
     private void moveToStatus(Status status) {
-        mRequestStore.moveToStatus(mRequest.getId(), status);
+        mStatusHandler.moveToStatus(mRequest.getId(), status);
     }
 }

@@ -9,6 +9,7 @@ import android.util.Log;
 import com.moac.android.downloader.download.RequestStore;
 import com.moac.android.downloader.download.Scheduler;
 import com.moac.android.downloader.download.Status;
+import com.moac.android.downloader.download.StatusHandler;
 
 import java.util.UUID;
 
@@ -23,17 +24,18 @@ public class DefaultDownloadClient extends Binder implements DownloadClient {
     private static final String TAG = DefaultDownloadClient.class.getSimpleName();
 
     private final RequestStore mRequestStore;
+    private final StatusHandler mStatusHandler;
 
-    @Inject
-    public DefaultDownloadClient(Context context, RequestStore requestStore, Scheduler scheduler) {
+    public DefaultDownloadClient(RequestStore requestStore, StatusHandler statusHandler) {
         Log.i(TAG, "Creating instance of DefaultDownloadClient: " + this);
         mRequestStore = requestStore;
+        mStatusHandler = statusHandler;
     }
 
     @Override
     public void cancel(String id) {
         Log.i(TAG, "Cancelling download Id: " + id);
-        mRequestStore.moveToStatus(id, Status.CANCELLED);
+        mStatusHandler.moveToStatus(id, Status.CANCELLED);
     }
 
     @Override

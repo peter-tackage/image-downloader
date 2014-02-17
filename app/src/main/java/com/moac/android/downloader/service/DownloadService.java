@@ -9,6 +9,7 @@ import com.moac.android.downloader.download.DownloaderFactory;
 import com.moac.android.downloader.download.Request;
 import com.moac.android.downloader.download.RequestStore;
 import com.moac.android.downloader.download.Scheduler;
+import com.moac.android.downloader.download.StatusHandler;
 import com.moac.android.downloader.injection.InjectingService;
 
 import java.util.concurrent.ExecutorService;
@@ -41,14 +42,15 @@ public class DownloadService extends InjectingService {
 
     IBinder mDownloadClient;
 
-    Scheduler mScheduler;
+    private Scheduler mScheduler;
+    private StatusHandler mStatusHandler;
 
     @Override
     public void onCreate() {
         super.onCreate();
-        mRequestStore = new RequestStore(this);
-        mScheduler = new Scheduler(mRequestStore, mExecutor, mDownloaderFactory);
-        mDownloadClient = new DefaultDownloadClient(this, mRequestStore, mScheduler);
+        mStatusHandler = new StatusHandler(this, mRequestStore);
+        mScheduler = new Scheduler(mStatusHandler, mExecutor, mDownloaderFactory);
+        mDownloadClient = new DefaultDownloadClient(mRequestStore, mStatusHandler);
     }
 
     @Override

@@ -6,6 +6,7 @@ import com.moac.android.downloader.download.Downloader;
 import com.moac.android.downloader.download.DownloaderFactory;
 import com.moac.android.downloader.download.HurlDownloader;
 import com.moac.android.downloader.download.RequestStore;
+import com.moac.android.downloader.download.StatusHandler;
 import com.moac.android.downloader.service.DownloadService;
 
 import java.util.concurrent.ExecutorService;
@@ -43,7 +44,7 @@ public class FakeDownloadAppModule {
     @Provides
     RequestStore provideRequestStore() {
         Log.i(TAG, "Providing RequestStore");
-        return new RequestStore(mApplication.getApplicationContext());
+        return new RequestStore();
     }
 
 }
