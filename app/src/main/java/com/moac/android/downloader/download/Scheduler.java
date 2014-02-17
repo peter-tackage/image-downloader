@@ -23,24 +23,21 @@ import javax.inject.Inject;
  * TODO Persistence and restart, status
  * TODO Prevent duplicate download attempts
  */
-public class Scheduler implements StatusHandler {
+public class Scheduler {
 
     private static final String TAG = Scheduler.class.getSimpleName();
 
     public static final String DOWNLOAD_DISPATCHER_THREAD_NAME = "DownloadDispatcher";
 
-    private final Context mContext;
     private final ExecutorService mRequestExecutor;
     private final DownloaderFactory mDownloaderFactory;
     private final Handler mDispatchHandler;
     private final HandlerThread mDispatchThread;
+    private final RequestStore mRequestStore;
 
-    // TODO This could be replaced by persistent storage
-    private Map<String, Status> mStatusMap = new HashMap<String, Status>();
-
-    public Scheduler(Context context, ExecutorService executor, DownloaderFactory downloaderFactory) {
+    public Scheduler(RequestStore requestStore, ExecutorService executor, DownloaderFactory downloaderFactory) {
         Log.i(TAG, "Creating Scheduler");
-        mContext = context;
+        mRequestStore = requestStore;
         mRequestExecutor = executor;
         mDownloaderFactory = downloaderFactory;
         mDispatchThread = new HandlerThread(DOWNLOAD_DISPATCHER_THREAD_NAME
@@ -52,11 +49,12 @@ public class Scheduler implements StatusHandler {
                 Log.i(TAG, "Handling msg on Dispatch Thread: " + Thread.currentThread());
                 switch (msg.what) {
                     case DownloadService.REQUEST_SUBMIT:
-                        Request request = (Request)msg.obj;
-                        Log.i(TAG, "Creating download job for id: " + request.getId());
-                        handleStatusChanged(request, Status.PENDING);
-                        Job job = new Job(request, mDownloaderFactory.newInstance(), Scheduler.this);
-                        mRequestExecutor.submit(job);
+                        Request request = (Request) msg.obj;
+                        if (mRequestStore.moveToStatus(request.getId(), Status.PENDING)) {
+                            Log.i(TAG, "Creating download job for id: " + request.getId());
+                            Job job = new Job(request, mDownloaderFactory.newInstance(), mRequestStore);
+                            mRequestExecutor.submit(job);
+                        }
                         break;
                     default:
                         Log.e(TAG, "Unexpected message type handled: " + msg.what);
@@ -77,22 +75,4 @@ public class Scheduler implements StatusHandler {
         mRequestExecutor.shutdown();
     }
 
-    @Override
-    public void handleStatusChanged(Request request, Status status) {
-        Log.i(TAG, "handleStatusChanged() Request: " + request.getUri() + " is now: " + status);
-        mStatusMap.put(request.getId(), status);
-        Intent intent = new Intent(DownloadService.STATUS_EVENTS);
-        intent.putExtra(DownloadService.DOWNLOAD_ID, request.getId());
-        intent.putExtra(DownloadService.STATUS, status);
-        LocalBroadcastManager.getInstance(mContext).sendBroadcast(intent);
-    }
-
-    public void cancel(String id) {
-        // TODO Cancel Job, remove.
-    }
-
-    public Status getStatus(String id) {
-        Status status = mStatusMap.get(id);
-        return status == null ? Status.UNKNOWN : status;
-    }
 }

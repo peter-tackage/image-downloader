@@ -17,12 +17,12 @@ class Job implements Runnable {
 
     private final Downloader mDownloader;
     private final Request mRequest;
-    private final StatusHandler mStatusHandler;
+    private final RequestStore mRequestStore;
 
-    public Job(Request request, Downloader downloader, StatusHandler statusHandler) {
+    public Job(Request request, Downloader downloader, RequestStore requestStore) {
         mRequest = request;
         mDownloader = downloader;
-        mStatusHandler = statusHandler;
+        mRequestStore = requestStore;
     }
 
     @Override
@@ -31,18 +31,18 @@ class Job implements Runnable {
         InputStream is = null;
         BufferedOutputStream fos = null;
         try {
-            notifyStatus(Status.RUNNING);
+            moveToStatus(Status.RUNNING);
             NetworkResponse networkResponse = mDownloader.load(mRequest.getUri(), mRequest.getDestination());
 
             // Verify the network response
             if (networkResponse == null) {
-                notifyStatus(Status.FAILED);
+                moveToStatus(Status.FAILED);
                 return;
             }
 
             is = networkResponse.getInputStream();
             if (is == null) {
-                notifyStatus(Status.FAILED);
+                moveToStatus(Status.FAILED);
                 return;
             }
 
@@ -64,19 +64,19 @@ class Job implements Runnable {
             }
             if(totalBytesRead < networkResponse.getContentLength()) {
                 Log.e(TAG, "Got " + bytesRead + " was expecting " + networkResponse.getContentLength());
-                notifyStatus(Status.FAILED);
+                moveToStatus(Status.FAILED);
                 return;
             }
-            notifyStatus(Status.SUCCESSFUL);
+            moveToStatus(Status.SUCCESSFUL);
         } catch (IOException e) {
-            notifyStatus(Status.FAILED);
+            moveToStatus(Status.FAILED);
         } finally {
             Utils.closeQuietly(is);
             Utils.closeQuietly(fos);
         }
     }
 
-    private void notifyStatus(Status status) {
-        mStatusHandler.handleStatusChanged(mRequest, status);
+    private void moveToStatus(Status status) {
+        mRequestStore.moveToStatus(mRequest.getId(), status);
     }
 }

@@ -22,6 +22,7 @@ import com.moac.android.downloader.service.DownloadService;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.HashMap;
 
 /*
  * Bind during onResume() to get DownloadClient in order to display
@@ -31,24 +32,27 @@ import java.util.ArrayList;
  * - Remote Uri
  * - Local destination location
  * - Tracking id
- *
- * TODO All submitted downloads could be stored in a database that
- * could be queried for state instead of binding to the service.
- *
- * TODO Updates could also be driven from this content provider/database without having
- * to use broadcasts
  */
 public class TestActivity extends Activity {
 
+    /*
+     * Test data
+     *
+     * A mock datasource that provides the Uri for an image with a unique identifier
+     */
+    private static final String TRACKING_ID_1 = "imageId1";
+    private static HashMap<String, Uri> FAKE_DATASOURCE = new HashMap<String, Uri>();
+    static {
+        FAKE_DATASOURCE.put(TRACKING_ID_1, Uri.parse("http://upload.wikimedia.org/wikipedia/commons/2/21/Adams_The_Tetons_and_the_Snake_River.jpg"));
+    }
+
     private static final String TAG = TestActivity.class.getSimpleName();
-    private static final String IMAGE_URL_1 = "http://upload.wikimedia.org/wikipedia/commons/2/21/Adams_The_Tetons_and_the_Snake_River.jpg";
     private static final String SUBMITTED_DOWNLOADS_KEY = "submittedDownloads";
 
     private DownloadClient mDownloadClient;
     private boolean mIsBound;
 
     // Test views, implementation is purely for demonstration purposes!
-    // TODO This would be done better with a custom view
     private ViewGroup mDemoPic1Container;
     private ViewGroup mDemoPic1ProgressIndicator;
 
@@ -64,7 +68,6 @@ public class TestActivity extends Activity {
             mDownloadClient = (DownloadClient) service;
             mIsBound = true;
             // We are bound, so we can query to find state
-            // TODO This would be better done by querying a DB
             restoreViewState(mDemoPic1Container);
         }
 
@@ -101,7 +104,7 @@ public class TestActivity extends Activity {
     }
 
     private View getIndicatorView(String id) {
-        if (id.equals(IMAGE_URL_1)) {
+        if (id.equals(TRACKING_ID_1)) {
             return mDemoPic1ProgressIndicator;
         }
         return null;
@@ -113,19 +116,21 @@ public class TestActivity extends Activity {
         setContentView(R.layout.activity_main);
         mDemoPic1ProgressIndicator = (ViewGroup) findViewById(R.id.vg_progress_indicator);
         mDemoPic1Container = (ViewGroup) findViewById(R.id.vg_demo_pic1);
-        // Associate the download Uri with the View.
-        mDemoPic1Container.setTag(IMAGE_URL_1);
+        // Associate the test download tracking id with the View.
+        mDemoPic1Container.setTag(TRACKING_ID_1);
         mDemoPic1Container.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 if (mIsBound) {
-                    String uriId = (String) v.getTag();
-                    if (mSubmittedDownloads.contains(uriId)) {
-                        mDownloadClient.cancel(uriId);
+                    String trackingId = (String) v.getTag();
+                    Uri uri = FAKE_DATASOURCE.get(trackingId);
+                    if (mSubmittedDownloads.contains(uri)) {
+                        mDownloadClient.cancel(trackingId);
+                        mSubmittedDownloads.remove(trackingId);
                     } else {
+                        mSubmittedDownloads.add(trackingId);
                         Intent i = new Intent(TestActivity.this, DownloadService.class);
-                        Uri uri = Uri.parse(uriId);
-                        i.putExtra(DownloadService.DOWNLOAD_ID, uriId);
+                        i.putExtra(DownloadService.DOWNLOAD_ID, trackingId);
                         i.putExtra(DownloadService.REMOTE_LOCATION, uri.toString());
                         i.putExtra(DownloadService.LOCAL_LOCATION, makeTestFile());
                         startService(i);
@@ -171,10 +176,10 @@ public class TestActivity extends Activity {
         public void onReceive(Context context, Intent intent) {
             Bundle bundle = intent.getExtras();
             if (bundle != null) {
-                String downloadId = bundle.getString(DownloadService.DOWNLOAD_ID);
+                String trackingId = bundle.getString(DownloadService.DOWNLOAD_ID);
                 Status status = (Status) bundle.get(DownloadService.STATUS);
-                Log.i(TAG, "Received event for downloadId: " + downloadId + " status: " + status);
-                onRequestStatusChanged(downloadId, status);
+                Log.i(TAG, "Received event for downloadId: " + trackingId + " status: " + status);
+                onRequestStatusChanged(trackingId, status);
             }
         }
     };

@@ -1,15 +1,14 @@
 package com.moac.android.downloader;
 
-import android.content.Context;
 import android.util.Log;
 
 import com.moac.android.downloader.download.Downloader;
 import com.moac.android.downloader.download.DownloaderFactory;
-import com.moac.android.downloader.download.FakeDownloader;
 import com.moac.android.downloader.download.HurlDownloader;
-import com.moac.android.downloader.download.Scheduler;
+import com.moac.android.downloader.download.RequestStore;
 import com.moac.android.downloader.service.DownloadService;
 
+import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 import dagger.Provides;
@@ -25,9 +24,9 @@ public class FakeDownloadAppModule {
     }
 
     @Provides
-    Scheduler provideScheduler(Context applicationContext, DownloaderFactory factory) {
-        Log.i(TAG, "Providing Scheduler");
-        return new Scheduler(applicationContext, Executors.newFixedThreadPool(5), factory);
+    ExecutorService provideExecutor() {
+        Log.i(TAG, "Providing ExecutorService");
+        return Executors.newFixedThreadPool(5);
     }
 
     @Provides
@@ -42,8 +41,9 @@ public class FakeDownloadAppModule {
     }
 
     @Provides
-    Context provideApplicationContext() {
-        return mApplication.getApplicationContext();
+    RequestStore provideRequestStore() {
+        Log.i(TAG, "Providing RequestStore");
+        return new RequestStore(mApplication.getApplicationContext());
     }
 
 }

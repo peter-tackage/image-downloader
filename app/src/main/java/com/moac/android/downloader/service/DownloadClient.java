@@ -1,11 +1,10 @@
 package com.moac.android.downloader.service;
 
-import com.moac.android.downloader.download.Status;
+import android.net.Uri;
 
-import java.util.EnumSet;
+import com.moac.android.downloader.download.Status;
 
 public interface DownloadClient {
     void cancel(String id);
     Status getStatus(String id);
-    String generateNextId();
 }

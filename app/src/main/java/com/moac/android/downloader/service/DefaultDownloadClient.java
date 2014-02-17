@@ -1,13 +1,15 @@
 package com.moac.android.downloader.service;
 
+import android.content.Context;
+import android.content.Intent;
+import android.net.Uri;
 import android.os.Binder;
 import android.util.Log;
 
-import com.moac.android.downloader.download.Request;
+import com.moac.android.downloader.download.RequestStore;
 import com.moac.android.downloader.download.Scheduler;
 import com.moac.android.downloader.download.Status;
 
-import java.util.EnumSet;
 import java.util.UUID;
 
 import javax.inject.Inject;
@@ -20,27 +22,23 @@ public class DefaultDownloadClient extends Binder implements DownloadClient {
 
     private static final String TAG = DefaultDownloadClient.class.getSimpleName();
 
-    private final Scheduler mScheduler;
+    private final RequestStore mRequestStore;
 
     @Inject
-    public DefaultDownloadClient(Scheduler scheduler) {
+    public DefaultDownloadClient(Context context, RequestStore requestStore, Scheduler scheduler) {
         Log.i(TAG, "Creating instance of DefaultDownloadClient: " + this);
-        mScheduler = scheduler;
+        mRequestStore = requestStore;
     }
 
     @Override
     public void cancel(String id) {
         Log.i(TAG, "Cancelling download Id: " + id);
-        mScheduler.cancel(id);
+        mRequestStore.moveToStatus(id, Status.CANCELLED);
     }
 
     @Override
     public Status getStatus(String id) {
-        return mScheduler.getStatus(id);
+        return mRequestStore.getStatus(id);
     }
 
-    @Override
-    public String generateNextId() {
-        return UUID.randomUUID().toString();
-    }
 }
