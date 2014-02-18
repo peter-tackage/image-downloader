@@ -38,16 +38,11 @@ public class DownloadService extends InjectingService {
     @Inject
     ThreadPoolExecutor mRequestExecutor;
 
+    @Inject
     IBinder mDownloadClient;
 
-    private StatusHandler mStatusHandler;
-
-    @Override
-    public void onCreate() {
-        super.onCreate();
-        mStatusHandler = new StatusHandler(LocalBroadcastManager.getInstance(this), mRequestStore);
-        mDownloadClient = new DefaultDownloadClient(mRequestStore, mStatusHandler);
-    }
+    @Inject
+    StatusHandler mStatusHandler;
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {

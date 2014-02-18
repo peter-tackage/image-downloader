@@ -35,7 +35,7 @@ public class StatusHandler {
             case SUCCESSFUL:
             case FAILED:
                 // Only support a restart from a finished state
-                isMoveAllowed = toStatus == Status.CREATED;
+                isMoveAllowed = toStatus == Status.CREATED || toStatus == Status.PENDING;
                 break;
             case CREATED:
             case PENDING:
