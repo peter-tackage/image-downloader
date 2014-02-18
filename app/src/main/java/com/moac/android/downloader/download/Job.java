@@ -43,8 +43,7 @@ class Job implements Runnable {
             Log.i(TAG, "Network response was: " + networkResponse.getContentLength());
 
             // Write stream to output destination file
-            FileWriter writer = new FileWriter();
-            writer.write(is, mRequest.getDestination(), networkResponse.getContentLength());
+            write(is, mRequest.getDestination(), networkResponse.getContentLength());
 
             // We finished without error
             moveToStatus(Status.SUCCESSFUL);
@@ -61,5 +60,34 @@ class Job implements Runnable {
     // Shorthand
     private void moveToStatus(Status status) {
         mStatusHandler.moveToStatus(mRequest.getId(), status);
+    }
+
+
+    public void write(InputStream inputStream, String fileDestination, long contentLength) throws IOException {
+
+        File output = new File(fileDestination);
+        if (output.exists() && output.isFile()) {
+            output.delete();
+        }
+
+        BufferedOutputStream fos = null;
+        try {
+            fos = new BufferedOutputStream(new FileOutputStream(output.getPath()));
+            final int BUFFER_SIZE = 4096;
+            byte[] buffer = new byte[BUFFER_SIZE];
+            int totalBytesRead = 0;
+            int bytesRead;
+            while ((bytesRead = inputStream.read(buffer)) != -1 && mRequest.getStatus() != Status.CANCELLED) {
+                fos.write(buffer, 0, bytesRead);
+                totalBytesRead += bytesRead;
+            }
+            fos.flush();
+            if (totalBytesRead < contentLength) {
+                throw new IOException("Read " + bytesRead + " from stream, was expecting " + contentLength);
+            }
+            Log.i(TAG, "Output file is apparently size: " + output.length());
+        } finally {
+            Utils.closeQuietly(fos);
+        }
     }
 }
