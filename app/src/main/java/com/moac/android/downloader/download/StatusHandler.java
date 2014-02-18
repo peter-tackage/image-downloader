@@ -4,7 +4,6 @@ import android.util.Log;
 
 /*
  * Responsible for state transition enforcement and notification
- *
  */
 public class StatusHandler {
 
@@ -18,8 +17,13 @@ public class StatusHandler {
         mRequestStore = requestStore;
     }
 
-    // Return true if the request support move is possible
-    public boolean moveToStatus(String id, Status toStatus) {
+    /**
+     *
+     * @param id The id of the request
+     * @param toStatus The desired status of request
+     * @return Return true if the requested move is possible, false otherwise
+     */
+    public synchronized boolean moveToStatus(String id, Status toStatus) {
         Status currentStatus = mRequestStore.getStatus(id);
         Log.i(TAG, "moveToStatus() - Attempting to move id: " + id + " from: " + currentStatus + " => " + toStatus);
         boolean isMoveAllowed;

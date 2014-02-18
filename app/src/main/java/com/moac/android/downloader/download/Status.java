@@ -1,6 +1,8 @@
 package com.moac.android.downloader.download;
 
 /**
+ * Represents the possible states of the request
+ *
  * Don't change the order without changing {@link StatusHandler#moveToStatus(String, Status)}
  */
 public enum Status {

@@ -4,6 +4,10 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
+/*
+ * Hold all requests, allows for querying of outcome.
+ * Currently does not store persistently
+ */
 public class RequestStore {
 
     private static final String TAG = RequestStore.class.getSimpleName();

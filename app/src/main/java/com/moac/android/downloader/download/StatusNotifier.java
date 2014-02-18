@@ -1,9 +1,10 @@
 package com.moac.android.downloader.download;
 
 /*
- * Interface for classes that notify of Job results
+ * A StatusNotifier is responsible for notifying interested parties
+ * of Request status changes.
  *
- * ..
+ * TODO Could improve the API, it lacks symmetry.
  */
 public interface StatusNotifier {
     public void notifySuccess(String id, String resultFile);

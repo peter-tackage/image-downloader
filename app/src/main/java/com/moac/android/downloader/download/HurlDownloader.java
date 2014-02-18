@@ -10,7 +10,8 @@ import java.net.URL;
 import javax.inject.Inject;
 
 /**
- * Implements a Downloader using HttpUrlConnection
+ * A {@link com.moac.android.downloader.download.Downloader} that is implemented
+ * using HttpUrlConnection
  */
 public class HurlDownloader implements Downloader {
 

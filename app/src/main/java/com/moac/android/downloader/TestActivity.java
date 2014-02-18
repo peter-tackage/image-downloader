@@ -17,6 +17,7 @@ import android.text.TextUtils;
 import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Toast;
 
 import com.moac.android.downloader.download.Status;
 import com.moac.android.downloader.service.DownloadClient;
@@ -25,6 +26,7 @@ import com.moac.android.downloader.service.DownloadService;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.UUID;
 
 /*
  * Bind during onResume() to get DownloadClient in order to display
@@ -46,6 +48,7 @@ public class TestActivity extends Activity {
      */
     private static final String TRACKING_ID_1 = "imageId1";
     private static HashMap<String, Uri> FAKE_DATASOURCE = new HashMap<String, Uri>();
+
     static {
         FAKE_DATASOURCE.put(TRACKING_ID_1, Uri.parse("http://upload.wikimedia.org/wikipedia/commons/2/21/Adams_The_Tetons_and_the_Snake_River.jpg"));
     }
@@ -100,9 +103,22 @@ public class TestActivity extends Activity {
                     mSubmittedDownloads.add(id);
                 }
                 break;
-            default:
+            case CANCELLED:
+                Toast.makeText(getApplicationContext(), "Download cancelled", Toast.LENGTH_SHORT).show();
                 getIndicatorView(id).setVisibility(View.GONE);
                 mSubmittedDownloads.remove(id);
+                break;
+            case SUCCESSFUL:
+                Toast.makeText(getApplicationContext(), "Downloaded to pictures folder!", Toast.LENGTH_SHORT).show();
+                getIndicatorView(id).setVisibility(View.GONE);
+                mSubmittedDownloads.remove(id);
+                break;
+            case FAILED:
+                Toast.makeText(getApplicationContext(), "Download failed", Toast.LENGTH_SHORT).show();
+                getIndicatorView(id).setVisibility(View.GONE);
+                mSubmittedDownloads.remove(id);
+                break;
+            default:
         }
     }
 
@@ -127,7 +143,7 @@ public class TestActivity extends Activity {
                 if (mIsBound) {
                     String trackingId = (String) v.getTag();
                     Uri uri = FAKE_DATASOURCE.get(trackingId);
-                    if (mSubmittedDownloads.contains(uri.toString())) {
+                    if (mSubmittedDownloads.contains(trackingId)) {
                         mDownloadClient.cancel(trackingId);
                         mSubmittedDownloads.remove(trackingId);
                     } else {
@@ -135,7 +151,7 @@ public class TestActivity extends Activity {
                         Intent i = new Intent(TestActivity.this, DownloadService.class);
                         i.putExtra(DownloadService.DOWNLOAD_ID, trackingId);
                         i.putExtra(DownloadService.REMOTE_LOCATION, uri.toString());
-                        i.putExtra(DownloadService.LOCAL_LOCATION, makeTestFilename());
+                        i.putExtra(DownloadService.LOCAL_LOCATION, generateUniqueTestFilename());
                         startService(i);
                     }
                 }
@@ -184,7 +200,7 @@ public class TestActivity extends Activity {
                 String localLocation = (String) bundle.get(DownloadService.LOCAL_LOCATION);
                 Log.i(TAG, "Received event for downloadId: " + trackingId + " status: " + status + " local: " + localLocation);
                 onRequestStatusChanged(trackingId, status);
-                if(!TextUtils.isEmpty(localLocation)) {
+                if (!TextUtils.isEmpty(localLocation)) {
                     triggerMediaScan(localLocation);
                 }
             }
@@ -198,16 +214,15 @@ public class TestActivity extends Activity {
                 new String[]{file.toString()}, null,
                 new MediaScannerConnection.OnScanCompletedListener() {
                     public void onScanCompleted(String path, Uri uri) {
-                        Log.i("ExternalStorage", "Scanned " + path + ":");
-                        Log.i("ExternalStorage", "-> uri=" + uri);
+                        Log.i("onScanCompleted", "Scanned " + path);
                     }
                 });
     }
 
-    private String makeTestFilename() {
+    private String generateUniqueTestFilename() {
         File path = Environment.getExternalStoragePublicDirectory(
                 Environment.DIRECTORY_PICTURES);
-        File file = new File(path, "DemoPicture1-"+System.currentTimeMillis()+".jpg");
+        File file = new File(path, "DownloadedPicture-" + UUID.randomUUID().toString() + ".jpg");
         return file.toString();
     }
 }

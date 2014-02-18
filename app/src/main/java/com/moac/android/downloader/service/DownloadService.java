@@ -85,8 +85,8 @@ public class DownloadService extends InjectingService {
 
     private void submit(Request request) {
         Log.i(TAG, "Creating download job for id: " + request.getId());
-        Job job = new Job(request, getObjectGraph().get(Downloader.class), mStatusHandler);
         // Submit to executor queue
+        Job job = new Job(request, getObjectGraph().get(Downloader.class), mStatusHandler);
         mRequestExecutor.submit(job);
     }
 

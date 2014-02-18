@@ -3,7 +3,7 @@ package com.moac.android.downloader.download;
 import android.net.Uri;
 
 /*
- * Describes a remote download request
+ * Represents a remote download request
  */
 public class Request {
 
@@ -28,4 +28,5 @@ public class Request {
     }
     public Status getStatus() { return mStatus;}
     void setStatus(Status status) { mStatus = status; }
+    boolean isCancelled() { return mStatus == Status.CANCELLED; }
 }

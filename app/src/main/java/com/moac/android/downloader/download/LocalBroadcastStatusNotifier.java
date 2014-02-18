@@ -5,6 +5,12 @@ import android.support.v4.content.LocalBroadcastManager;
 
 import com.moac.android.downloader.service.DownloadService;
 
+/**
+ * A {@link com.moac.android.downloader.download.StatusNotifier} that implements
+ * the StatusNotifier using a LocalBroadcastManager and Intents.
+ * The client is obviously dependent on this implementation if it wants to
+ * receive status updates for the requests without binding to the Service.
+ */
 public class LocalBroadcastStatusNotifier implements StatusNotifier {
 
     private final LocalBroadcastManager mLocalBroadcastManager;

@@ -5,7 +5,9 @@ import android.util.Log;
 import java.io.*;
 
 /*
- * A Runnable implementation that performs a download Request
+ * A Runnable implementation that performs a download Request. A bit ugly.
+ *
+ * TODO Provide better logging and stronger definition of state changes
  */
 public class Job implements Runnable {
 
@@ -26,27 +28,31 @@ public class Job implements Runnable {
         Log.i(TAG, "Job being run on thread: " + Thread.currentThread());
         InputStream is = null;
         try {
-            moveToStatus(Status.RUNNING);
+            // Verify that we can proceed
+            if (!moveToStatus(Status.RUNNING)) {
+                return;
+            }
             NetworkResponse networkResponse = mDownloader.load(mRequest.getUri(), mRequest.getDestination());
 
+            // Quit if cancelled
+            if (mRequest.isCancelled()) {
+                return;
+            }
+
             // Verify the network response
-            if (networkResponse == null) {
+            if (networkResponse == null
+                    || (is = networkResponse.getInputStream()) == null) {
                 moveToStatus(Status.FAILED);
                 return;
             }
 
-            is = networkResponse.getInputStream();
-            if (is == null) {
-                moveToStatus(Status.FAILED);
-                return;
-            }
             Log.i(TAG, "Network response was: " + networkResponse.getContentLength());
 
             // Write stream to output destination file
-            write(is, mRequest.getDestination(), networkResponse.getContentLength());
-
-            // We finished without error
-            moveToStatus(Status.SUCCESSFUL);
+            if (write(is, mRequest.getDestination(), networkResponse.getContentLength())) {
+                // We finished without error or cancelling
+                moveToStatus(Status.SUCCESSFUL);
+            }
 
         } catch (IOException e) {
             Log.e(TAG, String.format("Failed to complete download of %s to %s",
@@ -58,14 +64,16 @@ public class Job implements Runnable {
     }
 
     // Shorthand
-    private void moveToStatus(Status status) {
-        mStatusHandler.moveToStatus(mRequest.getId(), status);
+    private boolean moveToStatus(Status status) {
+        return mStatusHandler.moveToStatus(mRequest.getId(), status);
     }
 
-
-    public void write(InputStream inputStream, String fileDestination, long contentLength) throws IOException {
+    // Returns false if cancelled
+    private boolean write(InputStream inputStream, String fileDestination, long contentLength) throws IOException {
 
         File output = new File(fileDestination);
+        // Delete any existing file
+        // TODO Rename instead?
         if (output.exists() && output.isFile()) {
             output.delete();
         }
@@ -77,15 +85,23 @@ public class Job implements Runnable {
             byte[] buffer = new byte[BUFFER_SIZE];
             int totalBytesRead = 0;
             int bytesRead;
-            while ((bytesRead = inputStream.read(buffer)) != -1 && mRequest.getStatus() != Status.CANCELLED) {
+            while ((bytesRead = inputStream.read(buffer)) != -1 && !mRequest.isCancelled()) {
                 fos.write(buffer, 0, bytesRead);
                 totalBytesRead += bytesRead;
             }
             fos.flush();
-            if (totalBytesRead < contentLength) {
+            Log.i(TAG, "Output file is apparently size: " + output.length());
+            if (mRequest.isCancelled()) {
+                // Clean up the potentially unfinished file
+                File deleteFile = new File(output.getPath());
+                if(deleteFile.delete()) {
+                    Log.i(TAG, "Deleted unfinished download:" + output.getPath());
+                }
+                return false;
+            } else if (totalBytesRead < contentLength) {
                 throw new IOException("Read " + bytesRead + " from stream, was expecting " + contentLength);
             }
-            Log.i(TAG, "Output file is apparently size: " + output.length());
+            return true;
         } finally {
             Utils.closeQuietly(fos);
         }

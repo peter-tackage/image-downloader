@@ -2,6 +2,9 @@ package com.moac.android.downloader.download;
 
 import java.io.InputStream;
 
+/*
+ * A valid response from a Downloader
+ */
 public class NetworkResponse {
     private InputStream mInputStream;
     private long mContentLength;
