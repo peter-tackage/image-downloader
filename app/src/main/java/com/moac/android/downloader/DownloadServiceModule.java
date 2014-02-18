@@ -8,8 +8,10 @@ import android.util.Log;
 
 import com.moac.android.downloader.download.Downloader;
 import com.moac.android.downloader.download.HurlDownloader;
+import com.moac.android.downloader.download.LocalBroadcastStatusNotifier;
 import com.moac.android.downloader.download.RequestStore;
 import com.moac.android.downloader.download.StatusHandler;
+import com.moac.android.downloader.download.StatusNotifier;
 import com.moac.android.downloader.injection.ForService;
 import com.moac.android.downloader.service.DefaultDownloadClient;
 import com.moac.android.downloader.service.DownloadClient;
@@ -72,9 +74,15 @@ public class DownloadServiceModule {
 
     @Provides
     @Singleton
-    StatusHandler provideStatusHandler(@ForService Context context, RequestStore requestStore) {
+    StatusHandler provideStatusHandler(StatusNotifier statusNotifier, RequestStore requestStore) {
         Log.i(TAG, "Providing StatusHandler");
-        return new StatusHandler(LocalBroadcastManager.getInstance(context), requestStore);
+        return new StatusHandler(statusNotifier, requestStore);
     }
 
+    @Provides
+    @Singleton
+    StatusNotifier provideStatusNotifier(@ForService Context context) {
+        Log.i(TAG, "Providing StatusNotifier");
+        return new LocalBroadcastStatusNotifier(LocalBroadcastManager.getInstance(context));
+    }
 }

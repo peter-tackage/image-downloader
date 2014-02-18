@@ -34,6 +34,8 @@ import java.util.HashMap;
  * - Remote Uri
  * - Local destination location
  * - Tracking id
+ *
+ * Please don't judge the demo code :-)
  */
 public class TestActivity extends Activity {
 
@@ -125,7 +127,7 @@ public class TestActivity extends Activity {
                 if (mIsBound) {
                     String trackingId = (String) v.getTag();
                     Uri uri = FAKE_DATASOURCE.get(trackingId);
-                    if (mSubmittedDownloads.contains(uri)) {
+                    if (mSubmittedDownloads.contains(uri.toString())) {
                         mDownloadClient.cancel(trackingId);
                         mSubmittedDownloads.remove(trackingId);
                     } else {

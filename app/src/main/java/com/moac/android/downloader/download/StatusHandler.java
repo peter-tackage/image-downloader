@@ -1,26 +1,20 @@
 package com.moac.android.downloader.download;
 
-import android.content.Intent;
-import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
-
-import com.moac.android.downloader.service.DownloadService;
 
 /*
  * Responsible for state transition enforcement and notification
  *
- * A slightly more decoupled solution would take a more abstract
- * dependency to support the notification mechanism.
  */
 public class StatusHandler {
 
     private static final String TAG = StatusHandler.class.getSimpleName();
 
-    private final LocalBroadcastManager mLocalBroadCastManager;
     private final RequestStore mRequestStore;
+    private StatusNotifier mStatusNotifier;
 
-    public StatusHandler(LocalBroadcastManager localBroadcastManager, RequestStore requestStore) {
-        mLocalBroadCastManager = localBroadcastManager;
+    public StatusHandler(StatusNotifier statusNotifier, RequestStore requestStore) {
+        mStatusNotifier = statusNotifier;
         mRequestStore = requestStore;
     }
 
@@ -35,7 +29,8 @@ public class StatusHandler {
             case SUCCESSFUL:
             case FAILED:
                 // Only support a restart from a finished state
-                isMoveAllowed = toStatus == Status.CREATED || toStatus == Status.PENDING;
+                isMoveAllowed = toStatus == Status.CREATED || toStatus == Status.PENDING
+                        || currentStatus == toStatus;
                 break;
             case CREATED:
             case PENDING:
@@ -56,16 +51,13 @@ public class StatusHandler {
     private void setAndNotifyStateChanged(String id, Status toStatus) {
         Request request = mRequestStore.getRequest(id);
         request.setStatus(toStatus);
-        // Notify via Localbroadcast
-        if (mLocalBroadCastManager != null) {
-            Intent intent = new Intent(DownloadService.STATUS_EVENTS);
-            intent.putExtra(DownloadService.DOWNLOAD_ID, id);
-            intent.putExtra(DownloadService.STATUS, toStatus);
-            // Include the local location on completion (to support renaming)
-            if(toStatus == Status.SUCCESSFUL) {
-                intent.putExtra(DownloadService.LOCAL_LOCATION, mRequestStore.getRequest(id).getDestination());
+        // Notify of status change and/or result
+        if (mStatusNotifier != null) {
+            if (toStatus == Status.SUCCESSFUL) {
+                mStatusNotifier.notifySuccess(id, request.getDestination());
+            } else {
+                mStatusNotifier.notifyStatus(id, toStatus);
             }
-            mLocalBroadCastManager.sendBroadcast(intent);
         }
     }
 }
