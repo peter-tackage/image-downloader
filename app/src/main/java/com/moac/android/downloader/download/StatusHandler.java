@@ -28,8 +28,8 @@ public class StatusHandler {
             case CANCELLED:
             case SUCCESSFUL:
             case FAILED:
-                // Support a restart from a finished state or rewriting of finished state
-                isMoveAllowed = toStatus != Status.PENDING && toStatus != Status.RUNNING;
+                // Only support a restart from a finished state
+                isMoveAllowed = toStatus == Status.CREATED;
                 break;
             case CREATED:
             case PENDING:
