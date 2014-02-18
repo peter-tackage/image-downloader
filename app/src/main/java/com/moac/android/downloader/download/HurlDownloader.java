@@ -14,9 +14,6 @@ import javax.inject.Inject;
  */
 public class HurlDownloader implements Downloader {
 
-    @Inject
-    public HurlDownloader(){};
-
     private static final String TAG = HurlDownloader.class.getSimpleName();
     static final int DEFAULT_READ_TIMEOUT = 20 * 1000; // 20sec
     static final int DEFAULT_CONNECT_TIMEOUT = 15 * 1000; // 15sec
