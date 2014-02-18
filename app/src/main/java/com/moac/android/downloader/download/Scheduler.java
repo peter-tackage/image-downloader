@@ -57,7 +57,7 @@ public class Scheduler {
     }
 
     public void submit(Request request) {
-        mDispatchHandler.dispatchMessage(mDispatchHandler.obtainMessage(DownloadService.REQUEST_SUBMIT, request));
+        mDispatchHandler.sendMessage(mDispatchHandler.obtainMessage(DownloadService.REQUEST_SUBMIT, request));
     }
 
     public void stop() {

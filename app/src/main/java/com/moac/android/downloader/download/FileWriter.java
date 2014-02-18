@@ -1,5 +1,7 @@
 package com.moac.android.downloader.download;
 
+import android.util.Log;
+
 import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
@@ -8,10 +10,11 @@ import java.io.InputStream;
 
 public class FileWriter {
 
+    private static final String TAG = FileWriter.class.getSimpleName();
+
     public void write(InputStream inputStream, String fileDestination, long contentLength) throws IOException {
 
         File output = new File(fileDestination);
-        output.mkdirs();
         if (output.exists() && output.isFile()) {
             output.delete();
         }
@@ -27,9 +30,11 @@ public class FileWriter {
                 fos.write(buffer, 0, bytesRead);
                 totalBytesRead += bytesRead;
             }
+            fos.flush();
             if (totalBytesRead < contentLength) {
                 throw new IOException("Read " + bytesRead + " from stream, was expecting " + contentLength);
             }
+            Log.i(TAG, "Output file is apparently size: " + output.length());
         } finally {
             Utils.closeQuietly(fos);
         }

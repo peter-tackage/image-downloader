@@ -55,6 +55,9 @@ public class StatusHandler {
             Intent intent = new Intent(DownloadService.STATUS_EVENTS);
             intent.putExtra(DownloadService.DOWNLOAD_ID, id);
             intent.putExtra(DownloadService.STATUS, toStatus);
+            if(toStatus == Status.SUCCESSFUL) {
+                intent.putExtra(DownloadService.LOCAL_LOCATION, mRequestStore.getRequest(id).getDestination());
+            }
             mLocalBroadCastManager.sendBroadcast(intent);
         }
     }

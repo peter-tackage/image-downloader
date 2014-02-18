@@ -7,11 +7,13 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.ServiceConnection;
+import android.media.MediaScannerConnection;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
 import android.os.IBinder;
 import android.support.v4.content.LocalBroadcastManager;
+import android.text.TextUtils;
 import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
@@ -132,7 +134,7 @@ public class TestActivity extends Activity {
                         Intent i = new Intent(TestActivity.this, DownloadService.class);
                         i.putExtra(DownloadService.DOWNLOAD_ID, trackingId);
                         i.putExtra(DownloadService.REMOTE_LOCATION, uri.toString());
-                        i.putExtra(DownloadService.LOCAL_LOCATION, makeTestFile());
+                        i.putExtra(DownloadService.LOCAL_LOCATION, makeTestFilename());
                         startService(i);
                     }
                 }
@@ -178,13 +180,30 @@ public class TestActivity extends Activity {
             if (bundle != null) {
                 String trackingId = bundle.getString(DownloadService.DOWNLOAD_ID);
                 Status status = (Status) bundle.get(DownloadService.STATUS);
-                Log.i(TAG, "Received event for downloadId: " + trackingId + " status: " + status);
+                String localLocation = (String) bundle.get(DownloadService.LOCAL_LOCATION);
+                Log.i(TAG, "Received event for downloadId: " + trackingId + " status: " + status + " local: " + localLocation);
                 onRequestStatusChanged(trackingId, status);
+                if(!TextUtils.isEmpty(localLocation)) {
+                    triggerMediaScan(localLocation);
+                }
             }
         }
     };
 
-    private String makeTestFile() {
+    private void triggerMediaScan(String localLocation) {
+        File file = new File(localLocation);
+        Log.i(TAG, "Got file size in activity: " + file.length());
+        MediaScannerConnection.scanFile(this,
+                new String[]{file.toString()}, null,
+                new MediaScannerConnection.OnScanCompletedListener() {
+                    public void onScanCompleted(String path, Uri uri) {
+                        Log.i("ExternalStorage", "Scanned " + path + ":");
+                        Log.i("ExternalStorage", "-> uri=" + uri);
+                    }
+                });
+    }
+
+    private String makeTestFilename() {
         File path = Environment.getExternalStoragePublicDirectory(
                 Environment.DIRECTORY_PICTURES);
         File file = new File(path, "DemoPicture1-"+System.currentTimeMillis()+".jpg");
