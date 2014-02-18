@@ -73,8 +73,9 @@ public class DownloadService extends InjectingService {
                 request = mRequestStore.create(downloadId, Uri.parse(remoteLocation), localLocation);
                 mScheduler.submit(request);
             }
+        } else {
+            // TODO When restarted, we should check for any unfinished downloads (requires persistent store)
         }
-        // TODO When restarted, we should check for any unfinished downloads (requires persistent store)
         return START_STICKY;
     }
 
