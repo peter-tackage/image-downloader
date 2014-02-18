@@ -6,6 +6,12 @@ import android.util.Log;
 
 import com.moac.android.downloader.service.DownloadService;
 
+/*
+ * Responsible for state transition enforcement and notification
+ *
+ * A slightly more decoupled solution would take a more abstract
+ * dependency to support the notification mechanism.
+ */
 public class StatusHandler {
 
     private static final String TAG = StatusHandler.class.getSimpleName();
@@ -55,6 +61,7 @@ public class StatusHandler {
             Intent intent = new Intent(DownloadService.STATUS_EVENTS);
             intent.putExtra(DownloadService.DOWNLOAD_ID, id);
             intent.putExtra(DownloadService.STATUS, toStatus);
+            // Include the local location on completion (to support renaming)
             if(toStatus == Status.SUCCESSFUL) {
                 intent.putExtra(DownloadService.LOCAL_LOCATION, mRequestStore.getRequest(id).getDestination());
             }

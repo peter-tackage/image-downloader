@@ -7,7 +7,7 @@ import java.io.*;
 /*
  * A Runnable implementation that performs a download Request
  */
-class Job implements Runnable {
+public class Job implements Runnable {
 
     private static final String TAG = Job.class.getSimpleName();
 

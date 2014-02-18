@@ -7,14 +7,19 @@ import java.io.IOException;
 import java.net.HttpURLConnection;
 import java.net.URL;
 
+import javax.inject.Inject;
+
 /**
  * Implements a Downloader using HttpUrlConnection
  */
 public class HurlDownloader implements Downloader {
 
+    @Inject
+    public HurlDownloader(){};
+
     private static final String TAG = HurlDownloader.class.getSimpleName();
-    static final int DEFAULT_READ_TIMEOUT = 20 * 1000; // 20s
-    static final int DEFAULT_CONNECT_TIMEOUT = 15 * 1000; // 15s
+    static final int DEFAULT_READ_TIMEOUT = 20 * 1000; // 20sec
+    static final int DEFAULT_CONNECT_TIMEOUT = 15 * 1000; // 15sec
 
     @Override
     public NetworkResponse load(Uri uri, String destination) throws IOException {

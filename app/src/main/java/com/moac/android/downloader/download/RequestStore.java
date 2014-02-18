@@ -1,17 +1,19 @@
 package com.moac.android.downloader.download;
 
-import android.net.Uri;
-import android.util.Log;
-
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
+
+import javax.inject.Inject;
 
 public class RequestStore {
 
     private static final String TAG = RequestStore.class.getSimpleName();
 
     private Map<String, Request> mRequestMap = Collections.synchronizedMap(new HashMap<String, Request>());
+
+    @Inject
+    public RequestStore() {}
 
     public Status getStatus(String id) {
         Request request = mRequestMap.get(id);
@@ -22,12 +24,7 @@ public class RequestStore {
         return mRequestMap.get(id);
     }
 
-    public Request create(String id, Uri uri, String destination) {
-        Request request = new Request(id, uri, destination);
-        request.setStatus(Status.CREATED);
-        mRequestMap.put(id, request);
-        Log.i(TAG, "Created Request has status:" + request.getStatus());
-        return request;
+    public void add(Request request) {
+        mRequestMap.put(request.getId(), request);
     }
-
 }
