@@ -6,11 +6,11 @@ import com.moac.android.downloader.download.Downloader;
 import com.moac.android.downloader.download.DownloaderFactory;
 import com.moac.android.downloader.download.HurlDownloader;
 import com.moac.android.downloader.download.RequestStore;
-import com.moac.android.downloader.download.StatusHandler;
 import com.moac.android.downloader.service.DownloadService;
 
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
+import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.ThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
 
 import dagger.Provides;
 
@@ -25,9 +25,11 @@ public class FakeDownloadAppModule {
     }
 
     @Provides
-    ExecutorService provideExecutor() {
-        Log.i(TAG, "Providing ExecutorService");
-        return Executors.newFixedThreadPool(5);
+    ThreadPoolExecutor provideThreadPoolExecutor() {
+        Log.i(TAG, "Providing ThreadPoolExecutor");
+        return new ThreadPoolExecutor(5, 5,
+                0L, TimeUnit.MILLISECONDS,
+                new LinkedBlockingQueue<Runnable>());
     }
 
     @Provides

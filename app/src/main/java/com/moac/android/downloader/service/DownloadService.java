@@ -14,7 +14,7 @@ import com.moac.android.downloader.download.Status;
 import com.moac.android.downloader.download.StatusHandler;
 import com.moac.android.downloader.injection.InjectingService;
 
-import java.util.concurrent.ExecutorService;
+import java.util.concurrent.ThreadPoolExecutor;
 
 import javax.inject.Inject;
 
@@ -40,7 +40,7 @@ public class DownloadService extends InjectingService {
     DownloaderFactory mDownloaderFactory;
 
     @Inject
-    ExecutorService mExecutor;
+    ThreadPoolExecutor mExecutor;
 
     IBinder mDownloadClient;
 
@@ -74,6 +74,7 @@ public class DownloadService extends InjectingService {
                 mScheduler.submit(request);
             }
         }
+        // TODO When restarted, we should check for any unfinished downloads (requires persistent store)
         return START_STICKY;
     }
 

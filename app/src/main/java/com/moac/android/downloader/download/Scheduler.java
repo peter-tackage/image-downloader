@@ -7,7 +7,7 @@ import android.util.Log;
 
 import com.moac.android.downloader.service.DownloadService;
 
-import java.util.concurrent.ExecutorService;
+import java.util.concurrent.ThreadPoolExecutor;
 
 /*
  * Scheduler receives submitted download Request and
@@ -20,13 +20,13 @@ public class Scheduler {
     private static final String TAG = Scheduler.class.getSimpleName();
     private static final String DOWNLOAD_DISPATCHER_THREAD_NAME = "DownloadDispatcher";
 
-    private final ExecutorService mRequestExecutor;
+    private final ThreadPoolExecutor mRequestExecutor;
     private final DownloaderFactory mDownloaderFactory;
     private final Handler mDispatchHandler;
     private final HandlerThread mDispatchThread;
     private final StatusHandler mStatusHandler;
 
-    public Scheduler(StatusHandler statusHandler, ExecutorService executor, DownloaderFactory downloaderFactory) {
+    public Scheduler(StatusHandler statusHandler, ThreadPoolExecutor executor, DownloaderFactory downloaderFactory) {
         Log.i(TAG, "Creating Scheduler");
         mStatusHandler = statusHandler;
         mRequestExecutor = executor;

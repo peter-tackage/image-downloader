@@ -78,7 +78,6 @@ public class TestActivity extends Activity {
             Log.i(TAG, "onServiceDisconnected() - client is NOT available");
             mDownloadClient = null;
             mIsBound = false;
-            // TODO disable user download control here
         }
     };
 
