@@ -21,18 +21,31 @@ import com.moac.android.downloader.service.DownloadClient;
 import com.moac.android.downloader.service.DownloadService;
 
 import java.io.File;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.UUID;
 
 /*
- * Bind during onResume() to get DownloadClient in order to display
- * the state of any downloads in progress.
+ * TestActivity to drive the DownloadService
+ *
+ * Binds during onResume() to get DownloadClient in order to display
+ * the state of any downloads that were previously started.
+ *
+ * Registers a LocalBroadcastReceiver during onResume() to receive updates
+ * for in-progress requests.
+ *
+ * This implementation assigns a new unique filename for each request
  *
  * Start a download with an Intent including
+ * - Tracking id
  * - Remote Uri
  * - Local destination location
- * - Tracking id
+ * - Display name
+ * - Media Type (not yet supported)
+ *
+ * Media scanner is automatically triggered by the Service
+ *
+ * TODO Use a GridView and custom compound View to hold the images/overlay
+ * TODO Custom view would fire start/cancel events to a listener
  */
 public class TestActivity extends Activity {
 
@@ -51,7 +64,6 @@ public class TestActivity extends Activity {
     }
 
     private static final String TAG = TestActivity.class.getSimpleName();
-    private static final String SUBMITTED_DOWNLOADS_KEY = "submittedDownloads";
 
     private DownloadClient mDownloadClient;
     private boolean mIsBound;
@@ -60,15 +72,12 @@ public class TestActivity extends Activity {
     private ViewGroup mDemoPic1Container, mDemoPic2Container;
     private ViewGroup mDemoPic1ProgressIndicator, mDemoPic2ProgressIndicator;
 
-    private ArrayList<String> mSubmittedDownloads = new ArrayList<String>();
     private ServiceConnection mConnection = new ServiceConnection() {
-
-        private static final String TAG = "DownloadClientServiceConnection";
-
+        private static final String CONNECTION_TAG = "DownloadClientServiceConnection";
         @Override
         public void onServiceConnected(ComponentName className,
                                        IBinder service) {
-            Log.i(TAG, "onServiceConnected() - client is now available");
+            Log.i(CONNECTION_TAG, "onServiceConnected() - client is now available");
             mDownloadClient = (DownloadClient) service;
             mIsBound = true;
             // We are bound, so we can query to find state
@@ -78,7 +87,7 @@ public class TestActivity extends Activity {
 
         @Override
         public void onServiceDisconnected(ComponentName name) {
-            Log.i(TAG, "onServiceDisconnected() - client is NOT available");
+            Log.i(CONNECTION_TAG, "onServiceDisconnected() - client is NOT available");
             mDownloadClient = null;
             mIsBound = false;
         }
@@ -91,11 +100,9 @@ public class TestActivity extends Activity {
                 String trackingId = (String) v.getTag();
                 Log.i("onClick()", "Clicked on imageId: " + trackingId);
                 Uri uri = FAKE_DATASOURCE.get(trackingId);
-                if (mSubmittedDownloads.contains(trackingId)) {
-                    mDownloadClient.cancel(trackingId);
-                    mSubmittedDownloads.remove(trackingId);
-                } else {
-                    mSubmittedDownloads.add(trackingId);
+                Status status = mDownloadClient.getStatus(trackingId);
+                if (status == Status.UNKNOWN || status.ordinal() >= Status.CANCELLED.ordinal()) {
+                    // Create the start intent
                     Intent i = new Intent(TestActivity.this, DownloadService.class);
                     i.putExtra(DownloadService.DOWNLOAD_ID, trackingId);
                     i.putExtra(DownloadService.REMOTE_LOCATION, uri.toString());
@@ -103,6 +110,8 @@ public class TestActivity extends Activity {
                     i.putExtra(DownloadService.LOCAL_LOCATION, destinationFilename);
                     i.putExtra(DownloadService.DISPLAY_NAME, new File(destinationFilename).getName());
                     startService(i);
+                } else {
+                    mDownloadClient.cancel(trackingId);
                 }
             }
         }
@@ -119,33 +128,26 @@ public class TestActivity extends Activity {
         switch (status) {
             case UNKNOWN:
                 getIndicatorView(id).setVisibility(View.GONE);
-                mSubmittedDownloads.remove(id);
                 break;
             case CREATED:
             case PENDING:
             case RUNNING:
                 getIndicatorView(id).setVisibility(View.VISIBLE);
-                if (!mSubmittedDownloads.contains(id)) {
-                    mSubmittedDownloads.add(id);
-                }
                 break;
             case CANCELLED:
                 // (showToast)
                 //    Toast.makeText(getApplicationContext(), "Download cancelled", Toast.LENGTH_SHORT).show();
                 getIndicatorView(id).setVisibility(View.GONE);
-                mSubmittedDownloads.remove(id);
                 break;
             case SUCCESSFUL:
                 //if (showToast)
                 //    Toast.makeText(getApplicationContext(), "Downloaded to pictures folder", Toast.LENGTH_SHORT).show();
                 getIndicatorView(id).setVisibility(View.GONE);
-                mSubmittedDownloads.remove(id);
                 break;
             case FAILED:
                 //if (showToast)
                 //    Toast.makeText(getApplicationContext(), "Download failed", Toast.LENGTH_SHORT).show();
                 getIndicatorView(id).setVisibility(View.GONE);
-                mSubmittedDownloads.remove(id);
                 break;
             default:
         }
@@ -197,18 +199,6 @@ public class TestActivity extends Activity {
             mIsBound = false;
         }
         LocalBroadcastManager.getInstance(this).unregisterReceiver(mStatusReceiver);
-    }
-
-    @Override
-    protected void onSaveInstanceState(Bundle outState) {
-        super.onSaveInstanceState(outState);
-        outState.putStringArrayList(SUBMITTED_DOWNLOADS_KEY, mSubmittedDownloads);
-    }
-
-    @Override
-    protected void onRestoreInstanceState(Bundle savedInstanceState) {
-        super.onRestoreInstanceState(savedInstanceState);
-        mSubmittedDownloads = savedInstanceState.getStringArrayList(SUBMITTED_DOWNLOADS_KEY);
     }
 
     private BroadcastReceiver mStatusReceiver = new BroadcastReceiver() {
