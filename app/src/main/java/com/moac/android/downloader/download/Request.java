@@ -58,4 +58,10 @@ public class Request {
     boolean isCancelled() {
         return mStatus == Status.CANCELLED;
     }
+
+    public boolean isFinished() {
+        return mStatus == Status.FAILED
+                || mStatus == Status.CANCELLED
+                || mStatus == Status.SUCCESSFUL;
+    }
 }

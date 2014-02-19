@@ -25,30 +25,38 @@ public class StatusHandler {
     public synchronized boolean moveToStatus(String id, Status toStatus) {
         Status currentStatus = mRequestStore.getStatus(id);
         Log.i(TAG, "moveToStatus() - Attempting to move id: " + id + " from: " + currentStatus + " => " + toStatus);
-        boolean isMoveAllowed;
+
+        boolean isMovePermitted = isMovePermitted(id, toStatus);
+        if (isMovePermitted) {
+            setAndNotifyStateChanged(id, toStatus);
+
+        }
+        Log.i(TAG, "moveToStatus() - isMoveAllowed: " + isMovePermitted);
+        return isMovePermitted;
+    }
+
+    private boolean isMovePermitted(String id, Status toStatus) {
+        Status currentStatus = mRequestStore.getStatus(id);
+        boolean isMovePermitted;
         switch (currentStatus) {
             case UNKNOWN:
             case CANCELLED:
             case SUCCESSFUL:
             case FAILED:
                 // Only support a restart from a finished state
-                isMoveAllowed = toStatus == Status.CREATED || toStatus == Status.PENDING
+                isMovePermitted = toStatus == Status.CREATED || toStatus == Status.PENDING
                         || currentStatus == toStatus;
                 break;
             case CREATED:
             case PENDING:
             case RUNNING:
                 // Don't support move back for an in-progress request
-                isMoveAllowed = toStatus.ordinal() > currentStatus.ordinal();
+                isMovePermitted = toStatus.ordinal() > currentStatus.ordinal();
                 break;
             default:
                 throw new IllegalStateException("Unhandled request state: " + currentStatus);
         }
-        if (isMoveAllowed) {
-            setAndNotifyStateChanged(id, toStatus);
-        }
-        Log.i(TAG, "moveToStatus() - isMoveAllowed: " + isMoveAllowed);
-        return isMoveAllowed;
+        return isMovePermitted;
     }
 
     private void setAndNotifyStateChanged(String id, Status toStatus) {

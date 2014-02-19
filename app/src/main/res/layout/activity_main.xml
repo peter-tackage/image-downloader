@@ -1,27 +1,21 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="com.moac.android.downloader.TestActivity"
-    tools:ignore="MergeRootFrame"
-    android:orientation="vertical"
-    android:background="@android:color/black"
-    android:padding="8dp">
-<!-- Messy test layout -->
+    android:orientation="vertical">
+<!-- TODO Replace this with Grid and compound Views -->
     <FrameLayout
         android:id="@+id/vg_demo_pic1"
-        android:layout_height="wrap_content"
-        android:layout_width="wrap_content"
-        android:layout_weight="0.5"
-        android:layout_gravity="center">
+        android:layout_height="0dp"
+        android:layout_width="match_parent"
+        android:layout_weight="0.5">
 
         <ImageView
-            android:layout_height="250dp"
-            android:layout_width="250dp"
+            android:layout_height="match_parent"
+            android:layout_width="match_parent"
             android:id="@+id/iv_demo_pic1"
             android:src="@drawable/demo_pic1"
-            android:scaleType="centerCrop"
-            android:layout_gravity="center"/>
+            android:layout_gravity="center"
+            android:scaleType="centerCrop" />
 
         <RelativeLayout
             android:id="@+id/vg_progress_indicator_1"
@@ -39,10 +33,11 @@
                 android:id="@+id/pb_downloading_1"
                 android:layout_centerVertical="true"
                 android:layout_centerHorizontal="true" />
+
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Double tap to cancel"
+                android:text="Tap to cancel"
                 android:textColor="@android:color/white"
                 android:layout_below="@+id/pb_downloading_1"
                 android:layout_centerHorizontal="true" />
@@ -51,18 +46,17 @@
 
     <FrameLayout
         android:id="@+id/vg_demo_pic2"
-        android:layout_height="wrap_content"
-        android:layout_width="wrap_content"
-        android:layout_weight="0.5"
-        android:layout_gravity="center">
+        android:layout_height="0dp"
+        android:layout_width="match_parent"
+        android:layout_weight="0.5">
 
         <ImageView
-            android:layout_height="250dp"
-            android:layout_width="250dp"
+            android:layout_height="match_parent"
+            android:layout_width="match_parent"
             android:id="@+id/iv_demo_pic2"
             android:src="@drawable/demo_pic2"
-            android:scaleType="centerCrop"
-            android:layout_gravity="center"/>
+            android:layout_gravity="center"
+            android:scaleType="centerCrop" />
 
         <RelativeLayout
             android:id="@+id/vg_progress_indicator_2"
@@ -76,13 +70,15 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:indeterminate="true"
+                android:layout_gravity="center"
                 android:id="@+id/pb_downloading_2"
                 android:layout_centerVertical="true"
                 android:layout_centerHorizontal="true" />
+
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Double tap to cancel"
+                android:text="Tap to cancel"
                 android:textColor="@android:color/white"
                 android:layout_below="@+id/pb_downloading_2"
                 android:layout_centerHorizontal="true" />

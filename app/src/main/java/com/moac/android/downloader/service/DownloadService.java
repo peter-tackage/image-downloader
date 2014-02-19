@@ -57,18 +57,18 @@ public class DownloadService extends InjectingService {
             String humanReadableName = intent.getStringExtra(DISPLAY_NAME);
 
             Request request = mRequestStore.getRequest(downloadId);
-            if (request == null) {
+            if (request == null || request.isFinished()) {
                 // If the request doesn't exist, then create it and add to the store
                 request = new Request(downloadId, humanReadableName, Uri.parse(remoteLocation), localLocation, mediaType);
                 mRequestStore.add(request);
-            }
-            // Check we are allow to proceed with the request
-            if (mStatusHandler.moveToStatus(downloadId, Status.PENDING)) {
-                submit(request);
+                // Check we are allow to proceed with the request
+                if (mStatusHandler.moveToStatus(downloadId, Status.PENDING)) {
+                    submit(request);
+                }
             }
 
         } else {
-            // When restarted due to kill we should check for any unfinished downloads
+            // TODO When restarted due to kill we should check for any unfinished downloads
             // and then invoke startService again on ourselves. This requires a persistent store
             // implementation
         }
