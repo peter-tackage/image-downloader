@@ -36,8 +36,6 @@ import java.util.UUID;
  * - Remote Uri
  * - Local destination location
  * - Tracking id
- *
- * Please don't judge the demo code :-)
  */
 public class TestActivity extends Activity {
 
@@ -77,8 +75,8 @@ public class TestActivity extends Activity {
             mDownloadClient = (DownloadClient) service;
             mIsBound = true;
             // We are bound, so we can query to find state
-            restoreViewState(mDemoPic1Container);
-            restoreViewState(mDemoPic2Container);
+            restoreViewState(mDemoPic1Container, false);
+            restoreViewState(mDemoPic2Container, false);
         }
 
         @Override
@@ -112,12 +110,12 @@ public class TestActivity extends Activity {
     };
 
     // Align the view states with the current download status
-    private void restoreViewState(View container) {
+    private void restoreViewState(View container, boolean showToast) {
         String id = (String) container.getTag();
-        onRequestStatusChanged(id, mDownloadClient.getStatus(id));
+        onRequestStatusChanged(id, mDownloadClient.getStatus(id), showToast);
     }
 
-    private void onRequestStatusChanged(String id, Status status) {
+    private void onRequestStatusChanged(String id, Status status, boolean showToast) {
         Log.i(TAG, "onRequestStatusChanged() - id: " + id + " is now: " + status);
         switch (status) {
             case UNKNOWN:
@@ -133,17 +131,20 @@ public class TestActivity extends Activity {
                 }
                 break;
             case CANCELLED:
-                Toast.makeText(getApplicationContext(), "Download cancelled", Toast.LENGTH_SHORT).show();
+                if(showToast)
+                    Toast.makeText(getApplicationContext(), "Download cancelled", Toast.LENGTH_SHORT).show();
                 getIndicatorView(id).setVisibility(View.GONE);
                 mSubmittedDownloads.remove(id);
                 break;
             case SUCCESSFUL:
-                Toast.makeText(getApplicationContext(), "Downloaded to pictures folder!", Toast.LENGTH_SHORT).show();
+                if(showToast)
+                    Toast.makeText(getApplicationContext(), "Downloaded to pictures folder", Toast.LENGTH_SHORT).show();
                 getIndicatorView(id).setVisibility(View.GONE);
                 mSubmittedDownloads.remove(id);
                 break;
             case FAILED:
-                Toast.makeText(getApplicationContext(), "Download failed", Toast.LENGTH_SHORT).show();
+                if(showToast)
+                    Toast.makeText(getApplicationContext(), "Download failed", Toast.LENGTH_SHORT).show();
                 getIndicatorView(id).setVisibility(View.GONE);
                 mSubmittedDownloads.remove(id);
                 break;
@@ -220,7 +221,7 @@ public class TestActivity extends Activity {
                 Status status = (Status) bundle.get(DownloadService.STATUS);
                 String localLocation = (String) bundle.get(DownloadService.LOCAL_LOCATION);
                 Log.i(TAG, "Received event for downloadId: " + trackingId + " status: " + status + " local: " + localLocation);
-                onRequestStatusChanged(trackingId, status);
+                onRequestStatusChanged(trackingId, status, true);
                 if (!TextUtils.isEmpty(localLocation)) {
                     triggerMediaScan(localLocation);
                 }

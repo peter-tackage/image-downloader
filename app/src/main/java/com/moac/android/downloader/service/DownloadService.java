@@ -3,7 +3,6 @@ package com.moac.android.downloader.service;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.IBinder;
-import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
 
 import com.moac.android.downloader.DownloadServiceModule;

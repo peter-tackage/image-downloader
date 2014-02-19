@@ -28,7 +28,7 @@ public class Job implements Runnable {
         Log.i(TAG, "Job being run on thread: " + Thread.currentThread());
         InputStream is = null;
         try {
-            // Verify that we can proceed
+            // Might have been cancelled - verify that download can proceed
             if (!moveToStatus(Status.RUNNING)) {
                 return;
             }
