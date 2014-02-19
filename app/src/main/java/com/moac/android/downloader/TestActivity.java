@@ -131,19 +131,19 @@ public class TestActivity extends Activity {
                 }
                 break;
             case CANCELLED:
-                if(showToast)
+                if (showToast)
                     Toast.makeText(getApplicationContext(), "Download cancelled", Toast.LENGTH_SHORT).show();
                 getIndicatorView(id).setVisibility(View.GONE);
                 mSubmittedDownloads.remove(id);
                 break;
             case SUCCESSFUL:
-                if(showToast)
+                if (showToast)
                     Toast.makeText(getApplicationContext(), "Downloaded to pictures folder", Toast.LENGTH_SHORT).show();
                 getIndicatorView(id).setVisibility(View.GONE);
                 mSubmittedDownloads.remove(id);
                 break;
             case FAILED:
-                if(showToast)
+                if (showToast)
                     Toast.makeText(getApplicationContext(), "Download failed", Toast.LENGTH_SHORT).show();
                 getIndicatorView(id).setVisibility(View.GONE);
                 mSubmittedDownloads.remove(id);

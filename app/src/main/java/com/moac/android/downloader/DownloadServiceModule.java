@@ -14,7 +14,6 @@ import com.moac.android.downloader.download.StatusHandler;
 import com.moac.android.downloader.download.StatusNotifier;
 import com.moac.android.downloader.injection.ForService;
 import com.moac.android.downloader.service.DefaultDownloadClient;
-import com.moac.android.downloader.service.DownloadClient;
 import com.moac.android.downloader.service.DownloadService;
 
 import java.util.concurrent.LinkedBlockingQueue;

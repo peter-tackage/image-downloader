@@ -18,8 +18,7 @@ public class StatusHandler {
     }
 
     /**
-     *
-     * @param id The id of the request
+     * @param id       The id of the request
      * @param toStatus The desired status of request
      * @return Return true if the requested move is possible, false otherwise
      */

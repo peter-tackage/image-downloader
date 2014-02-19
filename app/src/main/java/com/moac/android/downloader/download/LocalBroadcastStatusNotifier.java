@@ -21,7 +21,7 @@ public class LocalBroadcastStatusNotifier implements StatusNotifier {
 
     @Override
     public void notifySuccess(String id, String resultFile) {
-       notify(id, Status.SUCCESSFUL, resultFile);
+        notify(id, Status.SUCCESSFUL, resultFile);
     }
 
     @Override
@@ -33,7 +33,7 @@ public class LocalBroadcastStatusNotifier implements StatusNotifier {
         Intent intent = new Intent(DownloadService.STATUS_EVENTS);
         intent.putExtra(DownloadService.DOWNLOAD_ID, id);
         intent.putExtra(DownloadService.STATUS, status);
-        if(status == Status.SUCCESSFUL && resultFile != null) {
+        if (status == Status.SUCCESSFUL && resultFile != null) {
             intent.putExtra(DownloadService.LOCAL_LOCATION, resultFile);
         }
         mLocalBroadcastManager.sendBroadcast(intent);

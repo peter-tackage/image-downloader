@@ -7,8 +7,6 @@ import java.io.IOException;
 import java.net.HttpURLConnection;
 import java.net.URL;
 
-import javax.inject.Inject;
-
 /**
  * A {@link com.moac.android.downloader.download.Downloader} that is implemented
  * using HttpUrlConnection

@@ -2,7 +2,11 @@ package com.moac.android.downloader.download;
 
 import android.util.Log;
 
-import java.io.*;
+import java.io.BufferedOutputStream;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
 
 /*
  * A Runnable implementation that performs a download Request. A bit ugly.
@@ -94,7 +98,7 @@ public class Job implements Runnable {
             if (mRequest.isCancelled()) {
                 // Clean up the potentially unfinished file
                 File deleteFile = new File(output.getPath());
-                if(deleteFile.delete()) {
+                if (deleteFile.delete()) {
                     Log.i(TAG, "Deleted unfinished download:" + output.getPath());
                 }
                 return false;

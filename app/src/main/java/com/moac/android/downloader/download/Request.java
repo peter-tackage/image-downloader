@@ -19,14 +19,27 @@ public class Request {
         mStatus = Status.CREATED;
     }
 
-    public String getId() { return mId; }
+    public String getId() {
+        return mId;
+    }
+
     public Uri getUri() {
         return mUri;
     }
+
     public String getDestination() {
         return mDestination;
     }
-    public Status getStatus() { return mStatus;}
-    void setStatus(Status status) { mStatus = status; }
-    boolean isCancelled() { return mStatus == Status.CANCELLED; }
+
+    public Status getStatus() {
+        return mStatus;
+    }
+
+    void setStatus(Status status) {
+        mStatus = status;
+    }
+
+    boolean isCancelled() {
+        return mStatus == Status.CANCELLED;
+    }
 }

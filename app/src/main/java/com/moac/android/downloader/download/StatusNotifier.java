@@ -8,5 +8,6 @@ package com.moac.android.downloader.download;
  */
 public interface StatusNotifier {
     public void notifySuccess(String id, String resultFile);
+
     public void notifyStatus(String id, Status status);
 }

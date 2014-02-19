@@ -9,7 +9,7 @@ import java.util.concurrent.TimeUnit;
 /**
  * A dummy {@link com.moac.android.downloader.download.Downloader}
  * to test the service mechanisms
- *
+ * <p/>
  * Returns an empty input stream
  */
 public class FakeDownloader implements Downloader {
