@@ -47,10 +47,12 @@ public class TestActivity extends Activity {
      * A mock datasource that provides the Uri for an image with a unique identifier
      */
     private static final String TRACKING_ID_1 = "imageId1";
+    private static final String TRACKING_ID_2 = "imageId2";
     private static HashMap<String, Uri> FAKE_DATASOURCE = new HashMap<String, Uri>();
 
     static {
         FAKE_DATASOURCE.put(TRACKING_ID_1, Uri.parse("http://upload.wikimedia.org/wikipedia/commons/2/21/Adams_The_Tetons_and_the_Snake_River.jpg"));
+        FAKE_DATASOURCE.put(TRACKING_ID_2, Uri.parse("http://upload.wikimedia.org/wikipedia/commons/5/57/ECurtis.jpg"));
     }
 
     private static final String TAG = TestActivity.class.getSimpleName();
@@ -60,8 +62,8 @@ public class TestActivity extends Activity {
     private boolean mIsBound;
 
     // Test views, implementation is purely for demonstration purposes!
-    private ViewGroup mDemoPic1Container;
-    private ViewGroup mDemoPic1ProgressIndicator;
+    private ViewGroup mDemoPic1Container, mDemoPic2Container;
+    private ViewGroup mDemoPic1ProgressIndicator, mDemoPic2ProgressIndicator;
 
     private ArrayList<String> mSubmittedDownloads = new ArrayList<String>();
     private ServiceConnection mConnection = new ServiceConnection() {
@@ -76,6 +78,7 @@ public class TestActivity extends Activity {
             mIsBound = true;
             // We are bound, so we can query to find state
             restoreViewState(mDemoPic1Container);
+            restoreViewState(mDemoPic2Container);
         }
 
         @Override
@@ -86,15 +89,41 @@ public class TestActivity extends Activity {
         }
     };
 
+    private View.OnClickListener imageOnClickListener = new View.OnClickListener() {
+        @Override
+        public void onClick(View v) {
+            if (mIsBound) {
+                String trackingId = (String) v.getTag();
+                Log.i("onClick()", "Clicked on imageId: " + trackingId);
+                Uri uri = FAKE_DATASOURCE.get(trackingId);
+                if (mSubmittedDownloads.contains(trackingId)) {
+                    mDownloadClient.cancel(trackingId);
+                    mSubmittedDownloads.remove(trackingId);
+                } else {
+                    mSubmittedDownloads.add(trackingId);
+                    Intent i = new Intent(TestActivity.this, DownloadService.class);
+                    i.putExtra(DownloadService.DOWNLOAD_ID, trackingId);
+                    i.putExtra(DownloadService.REMOTE_LOCATION, uri.toString());
+                    i.putExtra(DownloadService.LOCAL_LOCATION, generateUniqueTestFilename());
+                    startService(i);
+                }
+            }
+        }
+    };
+
     // Align the view states with the current download status
     private void restoreViewState(View container) {
-        String uriId = (String) container.getTag();
-        onRequestStatusChanged(uriId, mDownloadClient.getStatus(uriId));
+        String id = (String) container.getTag();
+        onRequestStatusChanged(id, mDownloadClient.getStatus(id));
     }
 
     private void onRequestStatusChanged(String id, Status status) {
         Log.i(TAG, "onRequestStatusChanged() - id: " + id + " is now: " + status);
         switch (status) {
+            case UNKNOWN:
+                getIndicatorView(id).setVisibility(View.GONE);
+                mSubmittedDownloads.remove(id);
+                break;
             case CREATED:
             case PENDING:
             case RUNNING:
@@ -125,6 +154,8 @@ public class TestActivity extends Activity {
     private View getIndicatorView(String id) {
         if (id.equals(TRACKING_ID_1)) {
             return mDemoPic1ProgressIndicator;
+        } else if (id.equals(TRACKING_ID_2)) {
+            return mDemoPic2ProgressIndicator;
         }
         return null;
     }
@@ -133,30 +164,20 @@ public class TestActivity extends Activity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        mDemoPic1ProgressIndicator = (ViewGroup) findViewById(R.id.vg_progress_indicator);
+
+        // Image 1
+        mDemoPic1ProgressIndicator = (ViewGroup) findViewById(R.id.vg_progress_indicator_1);
         mDemoPic1Container = (ViewGroup) findViewById(R.id.vg_demo_pic1);
         // Associate the test download tracking id with the View.
         mDemoPic1Container.setTag(TRACKING_ID_1);
-        mDemoPic1Container.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if (mIsBound) {
-                    String trackingId = (String) v.getTag();
-                    Uri uri = FAKE_DATASOURCE.get(trackingId);
-                    if (mSubmittedDownloads.contains(trackingId)) {
-                        mDownloadClient.cancel(trackingId);
-                        mSubmittedDownloads.remove(trackingId);
-                    } else {
-                        mSubmittedDownloads.add(trackingId);
-                        Intent i = new Intent(TestActivity.this, DownloadService.class);
-                        i.putExtra(DownloadService.DOWNLOAD_ID, trackingId);
-                        i.putExtra(DownloadService.REMOTE_LOCATION, uri.toString());
-                        i.putExtra(DownloadService.LOCAL_LOCATION, generateUniqueTestFilename());
-                        startService(i);
-                    }
-                }
-            }
-        });
+        mDemoPic1Container.setOnClickListener(imageOnClickListener);
+
+        // Image 2
+        mDemoPic2ProgressIndicator = (ViewGroup) findViewById(R.id.vg_progress_indicator_2);
+        mDemoPic2Container = (ViewGroup) findViewById(R.id.vg_demo_pic2);
+        // Associate the test download tracking id with the View.
+        mDemoPic2Container.setTag(TRACKING_ID_2);
+        mDemoPic2Container.setOnClickListener(imageOnClickListener);
     }
 
     @Override
@@ -219,7 +240,7 @@ public class TestActivity extends Activity {
                 });
     }
 
-    private String generateUniqueTestFilename() {
+    private static String generateUniqueTestFilename() {
         File path = Environment.getExternalStoragePublicDirectory(
                 Environment.DIRECTORY_PICTURES);
         File file = new File(path, "DownloadedPicture-" + UUID.randomUUID().toString() + ".jpg");
