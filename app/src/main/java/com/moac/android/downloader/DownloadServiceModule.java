@@ -1,6 +1,6 @@
 package com.moac.android.downloader;
 
-import android.app.Service;
+import android.app.NotificationManager;
 import android.content.Context;
 import android.os.IBinder;
 import android.support.v4.content.LocalBroadcastManager;
@@ -24,13 +24,17 @@ import javax.inject.Singleton;
 
 import dagger.Provides;
 
+/**
+ * Scoped to the lifetime of a Service - so singleton injections are re-provided
+ * when another Service instance is created.
+ */
 @dagger.Module(injects = {DownloadService.class, Downloader.class, HurlDownloader.class, RequestStore.class},
-        addsTo = ApplicationModule.class, library = true)
+        addsTo = ApplicationModule.class)
 public class DownloadServiceModule {
     private static final String TAG = DownloadServiceModule.class.getSimpleName();
-    private final Service mService;
+    private final DownloadService mService;
 
-    public DownloadServiceModule(Service service) {
+    public DownloadServiceModule(DownloadService service) {
         mService = service;
     }
 
@@ -82,6 +86,9 @@ public class DownloadServiceModule {
     @Singleton
     StatusNotifier provideStatusNotifier(@ForService Context context) {
         Log.i(TAG, "Providing StatusNotifier");
-        return new LocalBroadcastStatusNotifier(LocalBroadcastManager.getInstance(context));
+        return new LocalBroadcastStatusNotifier(context,
+                LocalBroadcastManager.getInstance(context),
+                (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE));
     }
+
 }

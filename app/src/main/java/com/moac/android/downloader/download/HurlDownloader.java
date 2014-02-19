@@ -14,8 +14,8 @@ import java.net.URL;
 public class HurlDownloader implements Downloader {
 
     private static final String TAG = HurlDownloader.class.getSimpleName();
-    static final int DEFAULT_READ_TIMEOUT = 20 * 1000; // 20sec
-    static final int DEFAULT_CONNECT_TIMEOUT = 15 * 1000; // 15sec
+    private static final int DEFAULT_READ_TIMEOUT = 20 * 1000; // 20sec
+    private static final int DEFAULT_CONNECT_TIMEOUT = 15 * 1000; // 15sec
 
     @Override
     public NetworkResponse load(Uri uri, String destination) throws IOException {

@@ -27,6 +27,8 @@ public class DownloadService extends InjectingService {
     public static final String STATUS = "com.moac.android.downloader.STATUS";
     public static final String REMOTE_LOCATION = "com.moac.android.downloader.REMOTE_LOCATION";
     public static final String LOCAL_LOCATION = "com.moac.android.downloader.LOCAL_LOCATION";
+    public static final String MEDIA_TYPE = "com.moac.android.downloader.MEDIA_TYPE";
+    public static final String DISPLAY_NAME = "com.moac.android.downloader.DISPLAY_NAME";
 
     // Logging
     private static final String TAG = DownloadService.class.getSimpleName();
@@ -51,10 +53,13 @@ public class DownloadService extends InjectingService {
             String downloadId = intent.getStringExtra(DOWNLOAD_ID);
             String remoteLocation = intent.getStringExtra(REMOTE_LOCATION);
             String localLocation = intent.getStringExtra(LOCAL_LOCATION);
+            String mediaType = intent.getStringExtra(MEDIA_TYPE);
+            String humanReadableName = intent.getStringExtra(DISPLAY_NAME);
 
             Request request = mRequestStore.getRequest(downloadId);
             if (request == null) {
-                request = new Request(downloadId, Uri.parse(remoteLocation), localLocation);
+                // If the request doesn't exist, then create it and add to the store
+                request = new Request(downloadId, humanReadableName, Uri.parse(remoteLocation), localLocation, mediaType);
                 mRequestStore.add(request);
             }
             // Check we are allow to proceed with the request
@@ -63,9 +68,9 @@ public class DownloadService extends InjectingService {
             }
 
         } else {
-            // TODO When restarted due to kill we should check for any unfinished downloads
-            // and then invoke startService again on ourselves.
-            // This requires a persistent store implementation
+            // When restarted due to kill we should check for any unfinished downloads
+            // and then invoke startService again on ourselves. This requires a persistent store
+            // implementation
         }
         return START_STICKY;
     }

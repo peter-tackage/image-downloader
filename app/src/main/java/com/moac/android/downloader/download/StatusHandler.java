@@ -56,11 +56,8 @@ public class StatusHandler {
         request.setStatus(toStatus);
         // Notify of status change and/or result
         if (mStatusNotifier != null) {
-            if (toStatus == Status.SUCCESSFUL) {
-                mStatusNotifier.notifySuccess(id, request.getDestination());
-            } else {
-                mStatusNotifier.notifyStatus(id, toStatus);
-            }
+            mStatusNotifier.notifyStatus(request);
         }
     }
 }
+

@@ -7,17 +7,14 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.ServiceConnection;
-import android.media.MediaScannerConnection;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
 import android.os.IBinder;
 import android.support.v4.content.LocalBroadcastManager;
-import android.text.TextUtils;
 import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Toast;
 
 import com.moac.android.downloader.download.Status;
 import com.moac.android.downloader.service.DownloadClient;
@@ -42,7 +39,7 @@ public class TestActivity extends Activity {
     /*
      * Test data
      *
-     * A mock datasource that provides the Uri for an image with a unique identifier
+     * A fake data source that provides the Uri for an image with a unique identifier
      */
     private static final String TRACKING_ID_1 = "imageId1";
     private static final String TRACKING_ID_2 = "imageId2";
@@ -102,7 +99,9 @@ public class TestActivity extends Activity {
                     Intent i = new Intent(TestActivity.this, DownloadService.class);
                     i.putExtra(DownloadService.DOWNLOAD_ID, trackingId);
                     i.putExtra(DownloadService.REMOTE_LOCATION, uri.toString());
-                    i.putExtra(DownloadService.LOCAL_LOCATION, generateUniqueTestFilename());
+                    String destinationFilename = generateUniqueTestFilename();
+                    i.putExtra(DownloadService.LOCAL_LOCATION, destinationFilename);
+                    i.putExtra(DownloadService.DISPLAY_NAME, new File(destinationFilename).getName());
                     startService(i);
                 }
             }
@@ -131,20 +130,20 @@ public class TestActivity extends Activity {
                 }
                 break;
             case CANCELLED:
-                if (showToast)
-                    Toast.makeText(getApplicationContext(), "Download cancelled", Toast.LENGTH_SHORT).show();
+                // (showToast)
+                //    Toast.makeText(getApplicationContext(), "Download cancelled", Toast.LENGTH_SHORT).show();
                 getIndicatorView(id).setVisibility(View.GONE);
                 mSubmittedDownloads.remove(id);
                 break;
             case SUCCESSFUL:
-                if (showToast)
-                    Toast.makeText(getApplicationContext(), "Downloaded to pictures folder", Toast.LENGTH_SHORT).show();
+                //if (showToast)
+                //    Toast.makeText(getApplicationContext(), "Downloaded to pictures folder", Toast.LENGTH_SHORT).show();
                 getIndicatorView(id).setVisibility(View.GONE);
                 mSubmittedDownloads.remove(id);
                 break;
             case FAILED:
-                if (showToast)
-                    Toast.makeText(getApplicationContext(), "Download failed", Toast.LENGTH_SHORT).show();
+                //if (showToast)
+                //    Toast.makeText(getApplicationContext(), "Download failed", Toast.LENGTH_SHORT).show();
                 getIndicatorView(id).setVisibility(View.GONE);
                 mSubmittedDownloads.remove(id);
                 break;
@@ -222,26 +221,11 @@ public class TestActivity extends Activity {
                 String localLocation = (String) bundle.get(DownloadService.LOCAL_LOCATION);
                 Log.i(TAG, "Received event for downloadId: " + trackingId + " status: " + status + " local: " + localLocation);
                 onRequestStatusChanged(trackingId, status, true);
-                if (!TextUtils.isEmpty(localLocation)) {
-                    triggerMediaScan(localLocation);
-                }
             }
         }
     };
 
-    private void triggerMediaScan(String localLocation) {
-        File file = new File(localLocation);
-        Log.i(TAG, "Got file size in activity: " + file.length());
-        MediaScannerConnection.scanFile(this,
-                new String[]{file.toString()}, null,
-                new MediaScannerConnection.OnScanCompletedListener() {
-                    public void onScanCompleted(String path, Uri uri) {
-                        Log.i("onScanCompleted", "Scanned " + path);
-                    }
-                });
-    }
-
-    private static String generateUniqueTestFilename() {
+    private String generateUniqueTestFilename() {
         File path = Environment.getExternalStoragePublicDirectory(
                 Environment.DIRECTORY_PICTURES);
         File file = new File(path, "DownloadedPicture-" + UUID.randomUUID().toString() + ".jpg");

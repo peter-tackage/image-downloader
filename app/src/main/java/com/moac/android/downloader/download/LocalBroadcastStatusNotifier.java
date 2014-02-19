@@ -1,42 +1,130 @@
 package com.moac.android.downloader.download;
 
+import android.app.Notification;
+import android.app.NotificationManager;
+import android.content.Context;
 import android.content.Intent;
+import android.media.MediaScannerConnection;
+import android.net.Uri;
+import android.support.v4.app.NotificationCompat;
 import android.support.v4.content.LocalBroadcastManager;
+import android.util.Log;
 
+import com.moac.android.downloader.R;
 import com.moac.android.downloader.service.DownloadService;
 
+import java.util.concurrent.atomic.AtomicInteger;
+
 /**
- * A {@link com.moac.android.downloader.download.StatusNotifier} that implements
- * the StatusNotifier using a LocalBroadcastManager and Intents.
+ * A {@link com.moac.android.downloader.download.StatusNotifier} that uses
+ * a LocalBroadcastManager and Intents.
+ * <p/>
  * The client is obviously dependent on this implementation if it wants to
  * receive status updates for the requests without binding to the Service.
+ * <p/>
+ * TODO This class is doing two things - the status bar notification component should be split from it.
  */
 public class LocalBroadcastStatusNotifier implements StatusNotifier {
 
+    // Used to generate sequential ids for tracking status bar notifications
+    private AtomicInteger mSequenceGenerator = new AtomicInteger();
+
+    private final Context mContext;
     private final LocalBroadcastManager mLocalBroadcastManager;
+    private final NotificationManager mNotificationManager;
 
-    public LocalBroadcastStatusNotifier(LocalBroadcastManager localBroadcastManager) {
+    public LocalBroadcastStatusNotifier(Context context,
+                                        LocalBroadcastManager localBroadcastManager,
+                                        NotificationManager notificationManager) {
+        mContext = context;
         mLocalBroadcastManager = localBroadcastManager;
+        mNotificationManager = notificationManager;
     }
 
     @Override
-    public void notifySuccess(String id, String resultFile) {
-        notify(id, Status.SUCCESSFUL, resultFile);
+    public void notifyStatus(Request request) {
+        sendLocalBroadcastNotification(request);
+        sendStatusBarNotification(request);
     }
 
-    @Override
-    public void notifyStatus(String id, Status status) {
-        notify(id, status, null);
-    }
-
-    private void notify(String id, Status status, String resultFile) {
+    private void sendLocalBroadcastNotification(Request request) {
+        // The broadcast intent - use by registered components
+        Status status = request.getStatus();
         Intent intent = new Intent(DownloadService.STATUS_EVENTS);
-        intent.putExtra(DownloadService.DOWNLOAD_ID, id);
-        intent.putExtra(DownloadService.STATUS, status);
-        if (status == Status.SUCCESSFUL && resultFile != null) {
-            intent.putExtra(DownloadService.LOCAL_LOCATION, resultFile);
+        intent.putExtra(DownloadService.DOWNLOAD_ID, request.getId());
+        intent.putExtra(DownloadService.STATUS, request.getStatus());
+        // Add the destination file path - it might be useful
+        if (status == Status.SUCCESSFUL) {
+            intent.putExtra(DownloadService.LOCAL_LOCATION, request.getDestination());
         }
         mLocalBroadcastManager.sendBroadcast(intent);
+    }
+
+    // TODO Would be nice if we could batch these together for multiple files
+    private void sendStatusBarNotification(Request request) {
+
+        // Make this behaviour optional
+        if(mNotificationManager == null)
+            return;
+
+        // If we are cancelling the download then cancel any existing notification
+        if (request.getStatus() == Status.CANCELLED) {
+            if (request.getNotificationId() != Request.UNSET_NOTIFICATION_ID) {
+                mNotificationManager.cancel(request.getNotificationId());
+            }
+            return;
+        }
+
+        // Otherwise conditionally create a new notification
+        NotificationCompat.Builder builder = new NotificationCompat.Builder(mContext);
+        Notification notification;
+
+        // Don't send status bar notifications for each state transition as it is distracting to the user
+        switch (request.getStatus()) {
+            case PENDING:
+                notification = builder
+                        .setSmallIcon(R.drawable.ic_launcher)
+                        .setContentTitle("Download in progress")
+                        .setContentText(request.getDisplayName())
+                        .setProgress(0, 0, true)
+                        .build();
+                break;
+            case FAILED:
+                notification = builder.setTicker("Media download failed")
+                        .setSmallIcon(R.drawable.ic_launcher)
+                        .setContentTitle("Download failed")
+                        .setContentText(request.getDisplayName())
+                        .build();
+                break;
+            case SUCCESSFUL:
+                notification = builder.setContentTitle("Media download complete")
+                        .setSmallIcon(R.drawable.ic_launcher)
+                        .setContentTitle("Download complete")
+                        .setContentText(request.getDisplayName())
+                        .build();
+                initiateMediaScan(request);
+                break;
+            default:
+                notification = null;
+                break;
+        }
+        if (notification != null) {
+            if (request.getNotificationId() == Request.UNSET_NOTIFICATION_ID) {
+                request.setNotificationId(mSequenceGenerator.getAndIncrement());
+            }
+            mNotificationManager.notify(request.getNotificationId(), notification);
+        }
+    }
+
+    private void initiateMediaScan(Request request) {
+        MediaScannerConnection.scanFile(mContext,
+                new String[]{request.getDestination()}, null,
+                new MediaScannerConnection.OnScanCompletedListener() {
+                    public void onScanCompleted(String path, Uri uri) {
+                        Log.i("onScanCompleted", "Scanned URI: " + uri);
+                        // TODO Update the notification
+                    }
+                });
     }
 
 }
