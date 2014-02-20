@@ -57,7 +57,6 @@ public class TestActivity extends Activity {
     private static final String TRACKING_ID_1 = "imageId1";
     private static final String TRACKING_ID_2 = "imageId2";
     private static HashMap<String, Uri> FAKE_DATASOURCE = new HashMap<String, Uri>();
-
     static {
         FAKE_DATASOURCE.put(TRACKING_ID_1, Uri.parse("http://upload.wikimedia.org/wikipedia/commons/2/21/Adams_The_Tetons_and_the_Snake_River.jpg"));
         FAKE_DATASOURCE.put(TRACKING_ID_2, Uri.parse("http://upload.wikimedia.org/wikipedia/commons/5/57/ECurtis.jpg"));
@@ -65,6 +64,7 @@ public class TestActivity extends Activity {
 
     private static final String TAG = TestActivity.class.getSimpleName();
 
+    // Direct interface to the Service
     private DownloadClient mDownloadClient;
     private boolean mIsBound;
 
@@ -81,8 +81,8 @@ public class TestActivity extends Activity {
             mDownloadClient = (DownloadClient) service;
             mIsBound = true;
             // We are bound, so we can query to find state
-            restoreViewState(mDemoPic1Container, false);
-            restoreViewState(mDemoPic2Container, false);
+            restoreViewState(mDemoPic1Container);
+            restoreViewState(mDemoPic2Container);
         }
 
         @Override
@@ -118,38 +118,27 @@ public class TestActivity extends Activity {
     };
 
     // Align the view states with the current download status
-    private void restoreViewState(View container, boolean showToast) {
+    private void restoreViewState(View container) {
         String id = (String) container.getTag();
-        onRequestStatusChanged(id, mDownloadClient.getStatus(id), showToast);
+        onRequestStatusChanged(id, mDownloadClient.getStatus(id));
     }
 
-    private void onRequestStatusChanged(String id, Status status, boolean showToast) {
+    private void onRequestStatusChanged(String id, Status status) {
         Log.i(TAG, "onRequestStatusChanged() - id: " + id + " is now: " + status);
         switch (status) {
-            case UNKNOWN:
-                getIndicatorView(id).setVisibility(View.GONE);
-                break;
             case CREATED:
             case PENDING:
             case RUNNING:
                 getIndicatorView(id).setVisibility(View.VISIBLE);
                 break;
+            case UNKNOWN:
             case CANCELLED:
-                // (showToast)
-                //    Toast.makeText(getApplicationContext(), "Download cancelled", Toast.LENGTH_SHORT).show();
-                getIndicatorView(id).setVisibility(View.GONE);
-                break;
             case SUCCESSFUL:
-                //if (showToast)
-                //    Toast.makeText(getApplicationContext(), "Downloaded to pictures folder", Toast.LENGTH_SHORT).show();
-                getIndicatorView(id).setVisibility(View.GONE);
-                break;
             case FAILED:
-                //if (showToast)
-                //    Toast.makeText(getApplicationContext(), "Download failed", Toast.LENGTH_SHORT).show();
                 getIndicatorView(id).setVisibility(View.GONE);
                 break;
             default:
+                throw new IllegalArgumentException("Unsupported Request state: " + status);
         }
     }
 
@@ -210,7 +199,7 @@ public class TestActivity extends Activity {
                 Status status = (Status) bundle.get(DownloadService.STATUS);
                 String localLocation = (String) bundle.get(DownloadService.LOCAL_LOCATION);
                 Log.i(TAG, "Received event for downloadId: " + trackingId + " status: " + status + " local: " + localLocation);
-                onRequestStatusChanged(trackingId, status, true);
+                onRequestStatusChanged(trackingId, status);
             }
         }
     };
