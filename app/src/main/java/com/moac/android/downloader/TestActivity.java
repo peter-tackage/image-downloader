@@ -53,6 +53,12 @@ public class TestActivity extends Activity {
      * Test data
      *
      * A fake data source that provides the Uri for an image with a unique identifier
+     *
+     * Test large files like -
+     *
+     * (Warning TIF viewing not supported) http://imgsrc.hubblesite.org/hu/db/images/hs-2004-32-d-full_tif.tif
+     *
+     *
      */
     private static final String TRACKING_ID_1 = "imageId1";
     private static final String TRACKING_ID_2 = "imageId2";

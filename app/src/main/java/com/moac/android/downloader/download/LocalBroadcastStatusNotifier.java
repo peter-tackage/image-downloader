@@ -48,12 +48,12 @@ public class LocalBroadcastStatusNotifier implements StatusNotifier {
     }
 
     private void sendLocalBroadcastNotification(Request request) {
-        // The broadcast intent - use by registered components
+        // The broadcast intent
         Status status = request.getStatus();
         Intent intent = new Intent(DownloadService.STATUS_EVENTS);
         intent.putExtra(DownloadService.DOWNLOAD_ID, request.getId());
         intent.putExtra(DownloadService.STATUS, request.getStatus());
-        // Add the destination file path - it might be useful
+        // Add the destination file path - it might be useful!
         if (status == Status.SUCCESSFUL) {
             intent.putExtra(DownloadService.LOCAL_LOCATION, request.getDestination());
         }
@@ -84,22 +84,23 @@ public class LocalBroadcastStatusNotifier implements StatusNotifier {
             case PENDING:
                 notification = builder
                         .setSmallIcon(R.drawable.ic_launcher)
-                        .setContentTitle("Download in progress")
+                        .setContentTitle(mContext.getString(R.string.notification_title_status_pending))
                         .setContentText(request.getDisplayName())
                         .setProgress(0, 0, true)
                         .build();
                 break;
             case FAILED:
-                notification = builder.setTicker("Media download failed")
+                notification = builder
                         .setSmallIcon(R.drawable.ic_launcher)
-                        .setContentTitle("Download failed")
+                        .setTicker(mContext.getString(R.string.notification_ticker_status_failed))
+                        .setContentTitle(mContext.getString(R.string.notification_title_status_failed))
                         .setContentText(request.getDisplayName())
                         .build();
                 break;
             case SUCCESSFUL:
-                notification = builder.setContentTitle("Media download complete")
+                notification = builder
                         .setSmallIcon(R.drawable.ic_launcher)
-                        .setContentTitle("Download complete")
+                        .setContentTitle(mContext.getString(R.string.notification_title_successful))
                         .setContentText(request.getDisplayName())
                         .build();
                 initiateMediaScan(request);
@@ -122,7 +123,7 @@ public class LocalBroadcastStatusNotifier implements StatusNotifier {
                 new MediaScannerConnection.OnScanCompletedListener() {
                     public void onScanCompleted(String path, Uri uri) {
                         Log.i("onScanCompleted", "Scanned URI: " + uri);
-                        // TODO Update the notification
+                        // TODO Update the notification with an Intent
                     }
                 });
     }

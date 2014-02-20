@@ -1,4 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">Image Downloader</string>
+    <string name="notification_title_status_pending">Download in progress</string>
+    <string name="notification_ticker_status_failed">Media download failed</string>
+    <string name="notification_title_status_failed">Download failed</string>
+    <string name="notification_title_successful">Download complete</string>
 </resources>
