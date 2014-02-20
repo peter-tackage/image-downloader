@@ -50,7 +50,7 @@ public class Job implements Runnable {
                 return;
             }
 
-            Log.i(TAG, "Network response was: " + networkResponse.getContentLength());
+            Log.i(TAG, "Network response was content-length: " + networkResponse.getContentLength());
 
             // Write stream to output destination file
             if (write(is, mRequest.getDestination(), networkResponse.getContentLength())) {
@@ -85,7 +85,7 @@ public class Job implements Runnable {
         BufferedOutputStream fos = null;
         try {
             fos = new BufferedOutputStream(new FileOutputStream(output.getPath()));
-            final int BUFFER_SIZE = 4096;
+            final int BUFFER_SIZE = 8192;
             byte[] buffer = new byte[BUFFER_SIZE];
             int totalBytesRead = 0;
             int bytesRead;
@@ -94,7 +94,7 @@ public class Job implements Runnable {
                 totalBytesRead += bytesRead;
             }
             fos.flush();
-            Log.i(TAG, "Output file is apparently size: " + output.length());
+            Log.i(TAG, "Output file is size: " + output.length());
             if (mRequest.isCancelled()) {
                 // Clean up the potentially unfinished file
                 File deleteFile = new File(output.getPath());
