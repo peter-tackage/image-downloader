@@ -92,9 +92,9 @@ public class DownloadService extends InjectingService {
                 // The problem is that during this method, the Executor still
                 // threads this (non-main) thread as being active, so if the message
                 //
-                // is handled immediately, it may nottrigger the shutdown.
-                // The 500ms is roughly suficient time for the Executor to remove
-                // the Runnablefrom  its active list.
+                // is handled immediately, it may not trigger the shutdown.
+                // The 500ms is roughly sufficient time for the Executor to remove
+                // the Runnable from  its active list.
                 //
                 // At worst, the shutdown won't be triggered by the message handler,
                 // which is better than shutting down prematurely.
