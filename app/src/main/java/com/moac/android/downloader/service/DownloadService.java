@@ -78,6 +78,8 @@ public class DownloadService extends InjectingService {
                         && mRequestExecutor.getActiveCount() == 0;
             }
         };
+
+        // TODO The tuning of these numbers may be application & device dependent
         mRequestExecutor = new ThreadPoolExecutor(5, 5,
                 0L, TimeUnit.MILLISECONDS,
                 new LinkedBlockingQueue<Runnable>()) {

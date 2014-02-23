@@ -4,15 +4,14 @@ import android.app.Notification;
 import android.app.NotificationManager;
 import android.content.Context;
 import android.content.Intent;
-import android.media.MediaScannerConnection;
 import android.net.Uri;
 import android.support.v4.app.NotificationCompat;
 import android.support.v4.content.LocalBroadcastManager;
-import android.util.Log;
 
 import com.moac.android.downloader.R;
 import com.moac.android.downloader.service.DownloadService;
 
+import java.io.File;
 import java.util.concurrent.atomic.AtomicInteger;
 
 /**
@@ -64,7 +63,7 @@ public class LocalBroadcastStatusNotifier implements StatusNotifier {
     private void sendStatusBarNotification(Request request) {
 
         // Make this behaviour optional
-        if(mNotificationManager == null)
+        if (mNotificationManager == null)
             return;
 
         // If we are cancelling the download then cancel any existing notification
@@ -118,14 +117,12 @@ public class LocalBroadcastStatusNotifier implements StatusNotifier {
     }
 
     private void initiateMediaScan(Request request) {
-        MediaScannerConnection.scanFile(mContext,
-                new String[]{request.getDestination()}, null,
-                new MediaScannerConnection.OnScanCompletedListener() {
-                    public void onScanCompleted(String path, Uri uri) {
-                        Log.i("onScanCompleted", "Scanned URI: " + uri);
-                        // TODO Update the notification with an Intent
-                    }
-                });
+        Intent mediaScanIntent = new Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE);
+        File f = new File(request.getDestination());
+        Uri contentUri = Uri.fromFile(f);
+        mediaScanIntent.setData(contentUri);
+        mContext.sendBroadcast(mediaScanIntent);
+        // TODO Update the notification with an intent to open the image
     }
 
 }
