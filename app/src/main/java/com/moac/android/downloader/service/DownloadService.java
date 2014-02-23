@@ -23,6 +23,15 @@ import java.util.concurrent.TimeUnit;
 
 import javax.inject.Inject;
 
+/**
+ * This is not implemented as an IntentService as they are designed to
+ * use a Handler with only a single (non-main) worker thread, with a message
+ * queue.
+ *
+ * This implementation uses a ThreadPoolExecutor to actually perform
+ * concurrent downloads which is worthwhile as it prevents a single long running
+ * download (or a stalled download) from delaying the execution of others.
+ */
 public class DownloadService extends InjectingService {
 
     // Broadcast and Intent extras
@@ -50,14 +59,14 @@ public class DownloadService extends InjectingService {
     StatusHandler mStatusHandler;
 
     private ThreadPoolExecutor mRequestExecutor;
-    private Handler mMainHandler;
+    private Handler mShutdownHandler;
 
     @Override
     public void onCreate() {
         super.onCreate();
 
         // Handle these on the main thread to prevent race conditions
-        mMainHandler = new Handler() {
+        mShutdownHandler = new Handler() {
             @Override
             public void handleMessage(Message msg) {
                 switch (msg.what) {
@@ -89,6 +98,7 @@ public class DownloadService extends InjectingService {
             protected void afterExecute(Runnable r, Throwable t) {
                 super.afterExecute(r, t);
                 // FIXME This delay approach is bad.
+                //
                 // The problem is that during this method, the Executor still
                 // threads this (non-main) thread as being active, so if the message
                 //
@@ -97,8 +107,11 @@ public class DownloadService extends InjectingService {
                 // the Runnable from  its active list.
                 //
                 // At worst, the shutdown won't be triggered by the message handler,
-                // which is better than shutting down prematurely.
-                mMainHandler.sendEmptyMessageDelayed(EXECUTION_COMPLETE, 500);
+                // which is better than shutting down prematurely. A service that stays
+                // alive after the completion of its task is not desirable, but given that
+                // it is idle, it will have negligible impact on the application.
+                //
+                mShutdownHandler.sendEmptyMessageDelayed(EXECUTION_COMPLETE, 500);
             }
 
         };
