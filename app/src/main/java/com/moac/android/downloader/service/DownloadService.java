@@ -2,7 +2,9 @@ package com.moac.android.downloader.service;
 
 import android.content.Intent;
 import android.net.Uri;
+import android.os.Handler;
 import android.os.IBinder;
+import android.os.Message;
 import android.util.Log;
 
 import com.moac.android.downloader.DownloadServiceModule;
@@ -15,7 +17,9 @@ import com.moac.android.downloader.download.StatusHandler;
 import com.moac.android.downloader.injection.InjectingService;
 
 import java.util.List;
+import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.ThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
 
 import javax.inject.Inject;
 
@@ -30,6 +34,9 @@ public class DownloadService extends InjectingService {
     public static final String MEDIA_TYPE = "com.moac.android.downloader.MEDIA_TYPE";
     public static final String DISPLAY_NAME = "com.moac.android.downloader.DISPLAY_NAME";
 
+    // Internal messages
+    private static final int EXECUTION_COMPLETE = 0;
+
     // Logging
     private static final String TAG = DownloadService.class.getSimpleName();
 
@@ -37,55 +44,93 @@ public class DownloadService extends InjectingService {
     RequestStore mRequestStore;
 
     @Inject
-    ThreadPoolExecutor mRequestExecutor;
-
-    @Inject
     IBinder mDownloadClient;
 
     @Inject
     StatusHandler mStatusHandler;
 
-    @Override
-    public int onStartCommand(Intent intent, int flags, int startId) {
-        Log.i(TAG, "onStartCommand() - intent: " + intent);
-        if (intent != null) {
-            // Extract the request details from the intent
-            String downloadId = intent.getStringExtra(DOWNLOAD_ID);
-            String remoteLocation = intent.getStringExtra(REMOTE_LOCATION);
-            String localLocation = intent.getStringExtra(LOCAL_LOCATION);
-            String mediaType = intent.getStringExtra(MEDIA_TYPE);
-            String humanReadableName = intent.getStringExtra(DISPLAY_NAME);
+    ThreadPoolExecutor mRequestExecutor;
+    Handler mMainHandler;
 
-            Request request = mRequestStore.getRequest(downloadId);
-            if (request == null || request.isFinished()) {
-                // If the request doesn't exist, then create it and add to the store
-                request = new Request(downloadId, humanReadableName, Uri.parse(remoteLocation), localLocation, mediaType);
-                mRequestStore.add(request);
-                // Check we are allow to proceed with the request
-                if (mStatusHandler.moveToStatus(downloadId, Status.PENDING)) {
-                    submit(request);
+    @Override
+    public void onCreate() {
+        super.onCreate();
+
+        // Handle these on the main thread to prevent race conditions
+        mMainHandler = new Handler() {
+            @Override
+            public void handleMessage(Message msg) {
+                switch (msg.what) {
+                    case EXECUTION_COMPLETE:
+                        Log.i(TAG, "Execution is complete");
+                        if(isExecutorIdle()) {
+                            Log.i(TAG, "Executor is IDLE - shutting down service");
+                            DownloadService.this.stopSelf();
+                        }
+                        break;
+                    default:
+                        break;
                 }
             }
 
-        } else {
-            // TODO When restarted due to kill we should check for any unfinished downloads
-            // and then invoke startService again on ourselves. This requires a persistent store
-            // implementation
+            public boolean isExecutorIdle() {
+                return mRequestExecutor.getQueue().size() == 0
+                        && mRequestExecutor.getActiveCount() == 0;
+            }
+        };
+        mRequestExecutor = new ThreadPoolExecutor(5, 5,
+                0L, TimeUnit.MILLISECONDS,
+                new LinkedBlockingQueue<Runnable>()) {
+            @Override
+            protected void afterExecute(Runnable r, Throwable t) {
+                super.afterExecute(r, t);
+                Message msg = mMainHandler.obtainMessage(EXECUTION_COMPLETE);
+                mMainHandler.sendMessage(msg);
+            }
+        };
+    }
+
+        @Override
+        public int onStartCommand (Intent intent,int flags, int startId){
+            Log.i(TAG, "onStartCommand() - intent: " + intent);
+            if (intent != null) {
+                // Extract the request details from the intent
+                String downloadId = intent.getStringExtra(DOWNLOAD_ID);
+                String remoteLocation = intent.getStringExtra(REMOTE_LOCATION);
+                String localLocation = intent.getStringExtra(LOCAL_LOCATION);
+                String mediaType = intent.getStringExtra(MEDIA_TYPE);
+                String humanReadableName = intent.getStringExtra(DISPLAY_NAME);
+
+                Request request = mRequestStore.getRequest(downloadId);
+                if (request == null || request.isFinished()) {
+                    // If the request doesn't exist, then create it and add to the store
+                    request = new Request(downloadId, humanReadableName, Uri.parse(remoteLocation), localLocation, mediaType);
+                    mRequestStore.add(request);
+                    // Check we are allow to proceed with the request
+                    if (mStatusHandler.moveToStatus(downloadId, Status.PENDING)) {
+                        submit(request);
+                    }
+                }
+
+            } else {
+                // TODO When restarted due to kill we should check for any unfinished downloads
+                // and then invoke startService again on ourselves. This requires a persistent store
+                // implementation
+            }
+            return START_STICKY;
         }
-        return START_STICKY;
-    }
 
-    @Override
-    public IBinder onBind(Intent intent) {
-        return mDownloadClient;
-    }
+        @Override
+        public IBinder onBind (Intent intent){
+            return mDownloadClient;
+        }
 
-    @Override
-    public void onDestroy() {
-        Log.i(TAG, "onDestroy()");
-        mRequestExecutor.shutdown();
-        super.onDestroy();
-    }
+        @Override
+        public void onDestroy () {
+            Log.i(TAG, "onDestroy()");
+            mRequestExecutor.shutdown();
+            super.onDestroy();
+        }
 
     private void submit(Request request) {
         Log.i(TAG, "Creating download job for id: " + request.getId());

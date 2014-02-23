@@ -16,10 +16,6 @@ import com.moac.android.downloader.injection.ForService;
 import com.moac.android.downloader.service.DefaultDownloadClient;
 import com.moac.android.downloader.service.DownloadService;
 
-import java.util.concurrent.LinkedBlockingQueue;
-import java.util.concurrent.ThreadPoolExecutor;
-import java.util.concurrent.TimeUnit;
-
 import javax.inject.Singleton;
 
 import dagger.Provides;
@@ -44,15 +40,6 @@ public class DownloadServiceModule {
     Context provideServiceContext() {
         Log.i(TAG, "Providing Service Context");
         return mService;
-    }
-
-    @Provides
-    @Singleton
-    ThreadPoolExecutor provideThreadPoolExecutor() {
-        Log.i(TAG, "Providing ThreadPoolExecutor");
-        return new ThreadPoolExecutor(5, 5,
-                0L, TimeUnit.MILLISECONDS,
-                new LinkedBlockingQueue<Runnable>());
     }
 
     @Provides
