@@ -49,8 +49,8 @@ public class DownloadService extends InjectingService {
     @Inject
     StatusHandler mStatusHandler;
 
-    ThreadPoolExecutor mRequestExecutor;
-    Handler mMainHandler;
+    private ThreadPoolExecutor mRequestExecutor;
+    private Handler mMainHandler;
 
     @Override
     public void onCreate() {
@@ -64,7 +64,8 @@ public class DownloadService extends InjectingService {
                     case EXECUTION_COMPLETE:
                         Log.i(TAG, "Execution is complete");
                         if(isExecutorIdle()) {
-                            Log.i(TAG, "Executor is IDLE - shutting down service");
+                            Log.i(TAG, "Executor is IDLE - requesting service shutdown");
+                            // This may not actual shutdown if still bound
                             DownloadService.this.stopSelf();
                         }
                         break;
@@ -74,8 +75,9 @@ public class DownloadService extends InjectingService {
             }
 
             public boolean isExecutorIdle() {
-                return mRequestExecutor.getQueue().size() == 0
-                        && mRequestExecutor.getActiveCount() == 0;
+                return mRequestExecutor.getQueue().size() == 0 &&
+                        mRequestExecutor.getActiveCount() == 0;
+
             }
         };
 
@@ -86,9 +88,19 @@ public class DownloadService extends InjectingService {
             @Override
             protected void afterExecute(Runnable r, Throwable t) {
                 super.afterExecute(r, t);
-                Message msg = mMainHandler.obtainMessage(EXECUTION_COMPLETE);
-                mMainHandler.sendMessage(msg);
+                // FIXME This delay approach is bad.
+                // The problem is that during this method, the Executor still
+                // threads this (non-main) thread as being active, so if the message
+                //
+                // is handled immediately, it may nottrigger the shutdown.
+                // The 500ms is roughly suficient time for the Executor to remove
+                // the Runnablefrom  its active list.
+                //
+                // At worst, the shutdown won't be triggered by the message handler,
+                // which is better than shutting down prematurely.
+                mMainHandler.sendEmptyMessageDelayed(EXECUTION_COMPLETE, 500);
             }
+
         };
     }
 
