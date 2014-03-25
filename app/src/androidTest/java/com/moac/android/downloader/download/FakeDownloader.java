@@ -7,7 +7,7 @@ import java.io.IOException;
 import java.util.concurrent.TimeUnit;
 
 /**
- * A dummy {@link com.moac.android.downloader.download.Downloader}
+ * A fake {@link com.moac.android.downloader.download.Downloader}
  * to test the service mechanisms
  * <p/>
  * Returns an empty input stream

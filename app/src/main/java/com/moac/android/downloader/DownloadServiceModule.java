@@ -9,9 +9,11 @@ import android.util.Log;
 import com.moac.android.downloader.download.Downloader;
 import com.moac.android.downloader.download.HurlDownloader;
 import com.moac.android.downloader.download.LocalBroadcastStatusNotifier;
+import com.moac.android.downloader.download.RequestExecutor;
 import com.moac.android.downloader.download.RequestStore;
 import com.moac.android.downloader.download.StatusHandler;
 import com.moac.android.downloader.download.StatusNotifier;
+import com.moac.android.downloader.download.ThreadPoolRequestExecutor;
 import com.moac.android.downloader.injection.ForService;
 import com.moac.android.downloader.service.DefaultDownloadClient;
 import com.moac.android.downloader.service.DownloadService;
@@ -21,7 +23,7 @@ import javax.inject.Singleton;
 import dagger.Provides;
 
 /**
- * Scoped to the lifetime of a Service - so singleton injections are re-provided
+ * Scoped to the lifetime of a Service instance - so singleton injections are re-provided
  * when another Service instance is created.
  */
 @dagger.Module(injects = {DownloadService.class, Downloader.class, HurlDownloader.class, RequestStore.class},
@@ -53,6 +55,12 @@ public class DownloadServiceModule {
     RequestStore provideRequestStore() {
         Log.i(TAG, "Providing RequestStore");
         return new RequestStore();
+    }
+
+    @Provides
+    @Singleton
+    RequestExecutor provideRequestExecutor() {
+        return new ThreadPoolRequestExecutor();
     }
 
     @Provides
