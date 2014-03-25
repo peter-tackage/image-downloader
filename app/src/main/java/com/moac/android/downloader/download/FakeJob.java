@@ -15,7 +15,6 @@ public class FakeJob extends Job {
     public FakeJob(long timeInSeconds, Status finalStatus) {
         super(null, null, null);
         mTimeInSeconds = timeInSeconds;
-
     }
 
     @Override

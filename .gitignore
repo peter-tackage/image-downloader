@@ -1,0 +1,8 @@
+# IntelliJ/AS artifacts
+*.iml
+.idea/
+local.properties
+
+# Gradle artifacts
+.gradle/
+build/
