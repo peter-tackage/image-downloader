@@ -16,7 +16,8 @@ public class DefaultTransitionerTest extends AndroidTestCase {
     }
 
     @Override
-    public void tearDown() {
+    public void tearDown() throws Exception {
+        super.tearDown();
         mTransitioner = null;
     }
 

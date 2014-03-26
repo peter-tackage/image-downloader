@@ -37,7 +37,8 @@ public class StatusHandlerTest extends AndroidTestCase {
     }
 
     @Override
-    public void tearDown() {
+    public void tearDown() throws Exception {
+        super.tearDown();
         mStatusNotifier = null;
         mStatusBarNotifier = null;
         mRequestStore = null;
