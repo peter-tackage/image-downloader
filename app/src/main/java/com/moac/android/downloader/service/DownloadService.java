@@ -73,7 +73,7 @@ public class DownloadService extends InjectingService {
                         boolean isIdle = mRequestExecutor.isIdle();
                         Log.i(TAG, "RequestExecutor is " + (isIdle ? "IDLE" : "NOT IDLE"));
                         if (isIdle) {
-                            // This will not shutdown if the Service is also still bound
+                            // This will not shutdown until the Service is also unbound
                             DownloadService.this.stopSelf();
                         }
                         break;
