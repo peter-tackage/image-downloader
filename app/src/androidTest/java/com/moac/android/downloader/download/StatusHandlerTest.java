@@ -5,6 +5,7 @@ import android.test.AndroidTestCase;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
+import static com.moac.android.downloader.download.Dummy.dummyRequest;
 import static org.fest.assertions.api.Assertions.assertThat;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyString;
@@ -44,7 +45,7 @@ public class StatusHandlerTest extends AndroidTestCase {
 
     // Status values are set to dummy values - Transitioner will allow all transitions
     public void test_notifiesWhenTransitionAllowed() {
-        when(mTransitioner.isAllowed(any(Status.class),any(Status.class))).thenReturn(true);
+        when(mTransitioner.isAllowed(any(Status.class), any(Status.class))).thenReturn(true);
         when(mRequestStore.getStatus(anyString())).thenReturn(Status.UNKNOWN);
         when(mRequestStore.getRequest(anyString())).thenReturn(dummyRequest());
 
@@ -67,7 +68,7 @@ public class StatusHandlerTest extends AndroidTestCase {
     }
 
     public void test_updatesStateWhenTransitionAllowed() {
-        when(mTransitioner.isAllowed(any(Status.class),any(Status.class))).thenReturn(true);
+        when(mTransitioner.isAllowed(any(Status.class), any(Status.class))).thenReturn(true);
         when(mRequestStore.getStatus(anyString())).thenReturn(Status.UNKNOWN);
         Request request = dummyRequest(Status.CREATED);
         when(mRequestStore.getRequest(anyString())).thenReturn(request);
@@ -79,7 +80,7 @@ public class StatusHandlerTest extends AndroidTestCase {
     }
 
     public void test_doesNotUpdateStateWhenTransitionDisallowed() {
-        when(mTransitioner.isAllowed(any(Status.class),any(Status.class))).thenReturn(false);
+        when(mTransitioner.isAllowed(any(Status.class), any(Status.class))).thenReturn(false);
         when(mRequestStore.getStatus(anyString())).thenReturn(Status.CREATED);
         Request request = dummyRequest(Status.CREATED);
         when(mRequestStore.getRequest(anyString())).thenReturn(request);
@@ -89,14 +90,5 @@ public class StatusHandlerTest extends AndroidTestCase {
         // State has not changed from that set in dummyRequest()
         assertThat(request.getStatus()).isEqualTo(Status.CREATED);
     }
-
-    private static Request dummyRequest() {
-        return new Request(null, null, null, null, null);
-    }
-
-    private static Request dummyRequest(Status status) {
-        Request request = new Request(null, null, null, null, null);
-        request.setStatus(status);
-        return request;
-    }
 }
+
