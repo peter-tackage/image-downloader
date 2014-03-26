@@ -1,34 +1,34 @@
 package com.moac.android.downloader.service;
 
 import android.app.Application;
+import android.content.Context;
 import android.content.Intent;
 import android.os.IBinder;
 import android.test.ServiceTestCase;
+import android.test.suitebuilder.annotation.MediumTest;
 import android.test.suitebuilder.annotation.SmallTest;
 
+import com.moac.android.downloader.download.Job;
 import com.moac.android.downloader.download.RequestExecutor;
 import com.moac.android.downloader.download.RequestStore;
 import com.moac.android.downloader.download.Status;
 import com.moac.android.downloader.download.StatusHandler;
 import com.moac.android.downloader.injection.Injector;
 import com.moac.android.downloader.test.MockTestDownloaderApplication;
-import com.moac.android.downloader.test.TestModule;
-
-import java.io.File;
 
 import javax.inject.Inject;
 
 import static org.fest.assertions.api.Assertions.assertThat;
+import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyString;
+import static org.mockito.Matchers.eq;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 public class DownloadServiceTest extends ServiceTestCase<DownloadService> {
 
     @Inject
     RequestStore mRequestStore;
-
-    @Inject
-    IBinder mDownloadClient;
 
     @Inject
     StatusHandler mStatusHandler;
@@ -46,12 +46,12 @@ public class DownloadServiceTest extends ServiceTestCase<DownloadService> {
         // Patch broken DexMaker
         System.setProperty("dexmaker.dexcache", getContext().getCacheDir().getPath());
 
-        // Provide injections
+        // Provide injections into application for the service
         Application app = new MockTestDownloaderApplication();
         app.onCreate();
         setApplication(app);
 
-        // Add injections of mocks
+        // Also provide mocks to this testcase
         ((Injector) (getApplication())).getObjectGraph().inject(this);
     }
 
@@ -60,13 +60,7 @@ public class DownloadServiceTest extends ServiceTestCase<DownloadService> {
      */
     @SmallTest
     public void test_startable() {
-        Intent startIntent = new Intent();
-        startIntent.setClass(getContext(), DownloadService.class);
-        startIntent.putExtra(DownloadService.DOWNLOAD_ID, "trackingId");
-                startIntent.putExtra(DownloadService.REMOTE_LOCATION, "dummy://afile");
-        startIntent.putExtra(DownloadService.LOCAL_LOCATION, "destinationFilename");
-        startIntent.putExtra(DownloadService.DISPLAY_NAME, "displayName");
-        startService(startIntent);
+        startService(getDummyDownloadIntent(getContext()));
     }
 
     /**
@@ -92,6 +86,31 @@ public class DownloadServiceTest extends ServiceTestCase<DownloadService> {
         DownloadClient client = ((DownloadClient)service);
 
         assertThat(client.getStatus(anyString())).isEqualTo(Status.UNKNOWN);
+    }
+
+    @MediumTest
+    public void test_newDownloadRequest() {
+        // Test the first new download -
+        when(mStatusHandler.moveToStatus(anyString(), eq(Status.PENDING))).thenReturn(true);
+        startService(getDummyDownloadIntent(getContext()));
+
+        verify(mRequestExecutor).submit(any(Job.class));
+
+    }
+
+    // Provides a dummy download intent
+    private static Intent getDummyDownloadIntent(Context context) {
+        return getDummyIntent(context, "trackingId");
+    }
+
+    private static Intent getDummyIntent(Context context, String trackingId) {
+        Intent startIntent = new Intent();
+        startIntent.setClass(context, DownloadService.class);
+        startIntent.putExtra(DownloadService.DOWNLOAD_ID, trackingId);
+        startIntent.putExtra(DownloadService.REMOTE_LOCATION, "dummy://afile");
+        startIntent.putExtra(DownloadService.LOCAL_LOCATION, "destinationFilename");
+        startIntent.putExtra(DownloadService.DISPLAY_NAME, "displayName");
+        return startIntent;
     }
 
 }
