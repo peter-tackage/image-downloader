@@ -10,12 +10,12 @@ public class StatusHandler {
     private static final String TAG = StatusHandler.class.getSimpleName();
 
     private final RequestStore mRequestStore;
-    private final StatusBarUpdater mStatusBarUpdater;
+    private final StatusBarNotifier mStatusBarNotifier;
     private final StatusNotifier mStatusNotifier;
 
-    public StatusHandler(StatusNotifier statusNotifier, StatusBarUpdater statusBarUpdater, RequestStore requestStore) {
+    public StatusHandler(StatusNotifier statusNotifier, StatusBarNotifier statusBarNotifier, RequestStore requestStore) {
         mStatusNotifier = statusNotifier;
-        mStatusBarUpdater = statusBarUpdater;
+        mStatusBarNotifier = statusBarNotifier;
         mRequestStore = requestStore;
     }
 
@@ -69,8 +69,8 @@ public class StatusHandler {
             mStatusNotifier.notifyStatus(request);
         }
         // Notify the status bar
-        if (mStatusBarUpdater != null) {
-            mStatusBarUpdater.sendStatusBarNotification(request);
+        if (mStatusBarNotifier != null) {
+            mStatusBarNotifier.sendStatusBarNotification(request);
         }
     }
 }

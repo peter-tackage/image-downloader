@@ -11,7 +11,7 @@ import com.moac.android.downloader.download.HurlDownloader;
 import com.moac.android.downloader.download.LocalBroadcastStatusNotifier;
 import com.moac.android.downloader.download.RequestExecutor;
 import com.moac.android.downloader.download.RequestStore;
-import com.moac.android.downloader.download.StatusBarUpdater;
+import com.moac.android.downloader.download.StatusBarNotifier;
 import com.moac.android.downloader.download.StatusHandler;
 import com.moac.android.downloader.download.StatusNotifier;
 import com.moac.android.downloader.download.ThreadPoolRequestExecutor;
@@ -73,15 +73,15 @@ public class DownloadServiceModule {
 
     @Provides
     @Singleton
-    StatusHandler provideStatusHandler(StatusNotifier statusNotifier,StatusBarUpdater statusBarUpdater, RequestStore requestStore) {
+    StatusHandler provideStatusHandler(StatusNotifier statusNotifier,StatusBarNotifier statusBarNotifier, RequestStore requestStore) {
         Log.i(TAG, "Providing StatusHandler");
-        return new StatusHandler(statusNotifier, statusBarUpdater, requestStore);
+        return new StatusHandler(statusNotifier, statusBarNotifier, requestStore);
     }
 
     @Provides
     @Singleton
-    StatusBarUpdater provideStatusBarUpdater(@ForService Context context) {
-        return new StatusBarUpdater(context,
+    StatusBarNotifier provideStatusBarUpdater(@ForService Context context) {
+        return new StatusBarNotifier(context,
                 (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE));
     }
 

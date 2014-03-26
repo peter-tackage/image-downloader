@@ -12,7 +12,7 @@ import com.moac.android.downloader.R;
 import java.io.File;
 import java.util.concurrent.atomic.AtomicInteger;
 
-public class StatusBarUpdater {
+public class StatusBarNotifier {
 
     // Used to generate sequential ids for tracking status bar notifications
     private final AtomicInteger mSequenceGenerator = new AtomicInteger();
@@ -20,7 +20,7 @@ public class StatusBarUpdater {
     private final Context mContext;
     private final NotificationManager mNotificationManager;
 
-    public StatusBarUpdater(Context context, NotificationManager notificationManager) {
+    public StatusBarNotifier(Context context, NotificationManager notificationManager) {
         mContext = context;
         mNotificationManager = notificationManager;
     }
