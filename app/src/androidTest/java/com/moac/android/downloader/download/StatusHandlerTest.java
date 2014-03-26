@@ -1,14 +1,6 @@
-package com.moac.android.downloader.test;
+package com.moac.android.downloader.download;
 
 import android.test.AndroidTestCase;
-
-import com.moac.android.downloader.download.Request;
-import com.moac.android.downloader.download.RequestStore;
-import com.moac.android.downloader.download.Status;
-import com.moac.android.downloader.download.StatusBarNotifier;
-import com.moac.android.downloader.download.StatusHandler;
-import com.moac.android.downloader.download.StatusNotifier;
-import com.moac.android.downloader.download.Transitioner;
 
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
@@ -77,19 +69,19 @@ public class StatusHandlerTest extends AndroidTestCase {
     public void test_updatesStateWhenTransitionAllowed() {
         when(mTransitioner.isAllowed(any(Status.class),any(Status.class))).thenReturn(true);
         when(mRequestStore.getStatus(anyString())).thenReturn(Status.UNKNOWN);
-        Request request = dummyRequest();
+        Request request = dummyRequest(Status.CREATED);
         when(mRequestStore.getRequest(anyString())).thenReturn(request);
 
         mStatusHandler.moveToStatus("dummy", Status.RUNNING);
 
+        // State has been updated
         assertThat(request.getStatus()).isEqualTo(Status.RUNNING);
     }
 
-    // FIXME This test depends on the Request implementation's initial Status value
     public void test_doesNotUpdateStateWhenTransitionDisallowed() {
         when(mTransitioner.isAllowed(any(Status.class),any(Status.class))).thenReturn(false);
         when(mRequestStore.getStatus(anyString())).thenReturn(Status.CREATED);
-        Request request = dummyRequest();
+        Request request = dummyRequest(Status.CREATED);
         when(mRequestStore.getRequest(anyString())).thenReturn(request);
 
         mStatusHandler.moveToStatus("dummy", Status.RUNNING);
@@ -100,5 +92,11 @@ public class StatusHandlerTest extends AndroidTestCase {
 
     private static Request dummyRequest() {
         return new Request(null, null, null, null, null);
+    }
+
+    private static Request dummyRequest(Status status) {
+        Request request = new Request(null, null, null, null, null);
+        request.setStatus(status);
+        return request;
     }
 }

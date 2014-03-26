@@ -1,9 +1,6 @@
-package com.moac.android.downloader.test;
+package com.moac.android.downloader.download;
 
 import android.test.AndroidTestCase;
-
-import com.moac.android.downloader.download.DefaultTransitioner;
-import com.moac.android.downloader.download.Status;
 
 import static org.fest.assertions.api.Assertions.assertThat;
 

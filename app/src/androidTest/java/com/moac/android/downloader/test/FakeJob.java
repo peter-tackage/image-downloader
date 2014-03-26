@@ -1,6 +1,9 @@
-package com.moac.android.downloader.download;
+package com.moac.android.downloader.test;
 
 import android.util.Log;
+
+import com.moac.android.downloader.download.Job;
+import com.moac.android.downloader.download.Status;
 
 import java.util.concurrent.TimeUnit;
 

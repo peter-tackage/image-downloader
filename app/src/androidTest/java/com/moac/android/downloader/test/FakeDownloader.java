@@ -1,7 +1,10 @@
-package com.moac.android.downloader.download;
+package com.moac.android.downloader.test;
 
 import android.net.Uri;
 import android.util.Log;
+
+import com.moac.android.downloader.download.Downloader;
+import com.moac.android.downloader.download.NetworkResponse;
 
 import java.io.IOException;
 import java.util.concurrent.TimeUnit;
