@@ -41,6 +41,7 @@ public class StatusHandlerTest extends AndroidTestCase {
         mStatusNotifier = null;
         mStatusBarNotifier = null;
         mRequestStore = null;
+        mTransitioner = null;
     }
 
     // Status values are set to dummy values - Transitioner will allow all transitions

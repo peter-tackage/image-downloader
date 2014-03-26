@@ -17,6 +17,7 @@ public class ThreadPoolRequestExecutor implements RequestExecutor {
     private final ThreadPoolExecutor mRequestExecutor;
     private Handler mShutdownHandler;
 
+    // Sensible defaults
     public ThreadPoolRequestExecutor() {
         this(5, 5, 0l, TimeUnit.MILLISECONDS, new LinkedBlockingQueue<Runnable>());
     }

@@ -43,7 +43,8 @@ public class LocalBroadcastStatusNotifierTest extends AndroidTestCase {
 
         mStatusNotifer.notifyStatus(request);
 
-        verify(mLocalBroadcastManager).sendBroadcast(argThat(new IsExpectedIntent(request.getId(),request.getStatus(),request.getDestination())));
+        verify(mLocalBroadcastManager).sendBroadcast(argThat(new IsExpectedIntent(request.getId(),
+                request.getStatus(),request.getDestination())));
     }
 
     // Verify that the LOCAL_LOCATION is not set
@@ -53,7 +54,8 @@ public class LocalBroadcastStatusNotifierTest extends AndroidTestCase {
 
         mStatusNotifer.notifyStatus(request);
 
-        verify(mLocalBroadcastManager).sendBroadcast(argThat(new IsExpectedIntent(request.getId(),request.getStatus(),request.getDestination())));
+        verify(mLocalBroadcastManager).sendBroadcast(argThat(new IsExpectedIntent(request.getId(),
+                request.getStatus(),request.getDestination())));
     }
 
     class IsExpectedIntent extends ArgumentMatcher<Intent> {
