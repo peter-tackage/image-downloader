@@ -9,11 +9,14 @@ public class StatusHandler {
 
     private static final String TAG = StatusHandler.class.getSimpleName();
 
+    private final Transitioner mTransitioner;
     private final RequestStore mRequestStore;
     private final StatusBarNotifier mStatusBarNotifier;
     private final StatusNotifier mStatusNotifier;
 
-    public StatusHandler(StatusNotifier statusNotifier, StatusBarNotifier statusBarNotifier, RequestStore requestStore) {
+    public StatusHandler(Transitioner transitioner, StatusNotifier statusNotifier,
+                         StatusBarNotifier statusBarNotifier, RequestStore requestStore) {
+        mTransitioner = transitioner;
         mStatusNotifier = statusNotifier;
         mStatusBarNotifier = statusBarNotifier;
         mRequestStore = requestStore;
@@ -28,36 +31,11 @@ public class StatusHandler {
         Status currentStatus = mRequestStore.getStatus(id);
         Log.i(TAG, "moveToStatus() - Attempting to move id: " + id + " from: " + currentStatus + " => " + toStatus);
 
-        boolean isMovePermitted = isMovePermitted(id, toStatus);
+        boolean isMovePermitted = mTransitioner.isAllowed(currentStatus, toStatus);
         if (isMovePermitted) {
             setAndNotifyStateChanged(id, toStatus);
-
         }
-        Log.i(TAG, "moveToStatus() - isMoveAllowed: " + isMovePermitted);
-        return isMovePermitted;
-    }
-
-    private boolean isMovePermitted(String id, Status toStatus) {
-        Status currentStatus = mRequestStore.getStatus(id);
-        boolean isMovePermitted;
-        switch (currentStatus) {
-            case UNKNOWN:
-            case CANCELLED:
-            case SUCCESSFUL:
-            case FAILED:
-                // Only support a restart from a finished state
-                isMovePermitted = toStatus == Status.CREATED || toStatus == Status.PENDING
-                        || currentStatus == toStatus;
-                break;
-            case CREATED:
-            case PENDING:
-            case RUNNING:
-                // Don't support move back for an in-progress request
-                isMovePermitted = toStatus.ordinal() > currentStatus.ordinal();
-                break;
-            default:
-                throw new IllegalStateException("Unhandled request state: " + currentStatus);
-        }
+        Log.i(TAG, "moveToStatus() - isAllowed: " + isMovePermitted);
         return isMovePermitted;
     }
 
