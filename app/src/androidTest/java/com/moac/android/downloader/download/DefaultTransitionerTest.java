@@ -1,6 +1,7 @@
 package com.moac.android.downloader.download;
 
 import android.test.AndroidTestCase;
+import android.test.suitebuilder.annotation.SmallTest;
 
 import static org.fest.assertions.api.Assertions.assertThat;
 
@@ -24,6 +25,7 @@ public class DefaultTransitionerTest extends AndroidTestCase {
     /*
      * Test all transitions from the UNKNOWN request state
      */
+    @SmallTest
     public void test_isMovePermittedFromUnknownState() {
         assertThat(mTransitioner.isAllowed(Status.UNKNOWN, Status.UNKNOWN)).isTrue();
         assertThat(mTransitioner.isAllowed(Status.UNKNOWN, Status.CREATED)).isTrue();
@@ -37,6 +39,7 @@ public class DefaultTransitionerTest extends AndroidTestCase {
     /*
      * Test all transitions from the CREATED request state
      */
+    @SmallTest
     public void test_isMovePermittedFromCreatedState() {
         assertThat(mTransitioner.isAllowed(Status.CREATED, Status.UNKNOWN)).isFalse();
         assertThat(mTransitioner.isAllowed(Status.CREATED, Status.CREATED)).isFalse();
@@ -50,6 +53,7 @@ public class DefaultTransitionerTest extends AndroidTestCase {
     /*
      * Test all transitions from the PENDING request state
      */
+    @SmallTest
     public void test_isMovePermittedFromPendingState() {
         assertThat(mTransitioner.isAllowed(Status.PENDING, Status.UNKNOWN)).isFalse();
         assertThat(mTransitioner.isAllowed(Status.PENDING, Status.CREATED)).isFalse();
@@ -63,6 +67,7 @@ public class DefaultTransitionerTest extends AndroidTestCase {
     /*
      * Test all transitions from the RUNNING request state
      */
+    @SmallTest
     public void test_isMovePermittedFromRunningState() {
         assertThat(mTransitioner.isAllowed(Status.RUNNING, Status.UNKNOWN)).isFalse();
         assertThat(mTransitioner.isAllowed(Status.RUNNING, Status.CREATED)).isFalse();
@@ -76,6 +81,7 @@ public class DefaultTransitionerTest extends AndroidTestCase {
     /*
      * Test all transitions from the CANCELLED request state
      */
+    @SmallTest
     public void test_isMovePermittedFromCancelledState() {
         assertThat(mTransitioner.isAllowed(Status.CANCELLED, Status.UNKNOWN)).isFalse();
         assertThat(mTransitioner.isAllowed(Status.CANCELLED, Status.CREATED)).isTrue();
@@ -89,6 +95,7 @@ public class DefaultTransitionerTest extends AndroidTestCase {
     /*
     * Test all transitions from the SUCCESSFUL request state
     */
+    @SmallTest
     public void test_isMovePermittedFromSuccessfulState() {
         assertThat(mTransitioner.isAllowed(Status.SUCCESSFUL, Status.UNKNOWN)).isFalse();
         assertThat(mTransitioner.isAllowed(Status.SUCCESSFUL, Status.CREATED)).isTrue();
@@ -102,6 +109,7 @@ public class DefaultTransitionerTest extends AndroidTestCase {
     /*
      * Test all transitions from the FAILED request state
      */
+    @SmallTest
     public void test_isMovePermittedFromFailedState() {
         assertThat(mTransitioner.isAllowed(Status.FAILED, Status.UNKNOWN)).isFalse();
         assertThat(mTransitioner.isAllowed(Status.FAILED, Status.CREATED)).isTrue();

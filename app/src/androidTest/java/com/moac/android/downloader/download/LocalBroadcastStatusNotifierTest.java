@@ -4,6 +4,7 @@ import android.content.Intent;
 import android.net.Uri;
 import android.support.v4.content.LocalBroadcastManager;
 import android.test.AndroidTestCase;
+import android.test.suitebuilder.annotation.SmallTest;
 
 import com.moac.android.downloader.service.DownloadService;
 
@@ -38,6 +39,7 @@ public class LocalBroadcastStatusNotifierTest extends AndroidTestCase {
     }
 
     // Verify the LBM is given the correct Intent
+    @SmallTest
     public void test_successfulIntent() {
         Request request = new Request("id", "name", Uri.EMPTY, "destination", "mediaType");
         request.setStatus(Status.SUCCESSFUL);
@@ -49,6 +51,7 @@ public class LocalBroadcastStatusNotifierTest extends AndroidTestCase {
     }
 
     // Verify that the LOCAL_LOCATION is not set
+    @SmallTest
     public void test_unSuccessfulIntent() {
         Request request = new Request("id", "name", Uri.EMPTY, "destination", "mediaType");
         request.setStatus(Status.FAILED);

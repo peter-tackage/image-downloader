@@ -1,6 +1,7 @@
 package com.moac.android.downloader.download;
 
 import android.test.AndroidTestCase;
+import android.test.suitebuilder.annotation.SmallTest;
 
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
@@ -45,8 +46,9 @@ public class StatusHandlerTest extends AndroidTestCase {
         mTransitioner = null;
     }
 
-    // Status values are set to dummy values - Transitioner will allow all transitions
+    @SmallTest
     public void test_notifiesWhenTransitionAllowed() {
+        // Status values are set to dummy values - Transitioner will allow all transitions
         when(mTransitioner.isAllowed(any(Status.class), any(Status.class))).thenReturn(true);
         when(mRequestStore.getStatus(anyString())).thenReturn(Status.UNKNOWN);
         when(mRequestStore.getRequest(anyString())).thenReturn(dummyRequest());
@@ -57,9 +59,10 @@ public class StatusHandlerTest extends AndroidTestCase {
         verify(mStatusBarNotifier).sendStatusBarNotification(any(Request.class));
     }
 
-    // Status values are set to dummy values - Transitioner will disallow all transitions
+    @SmallTest
     public void test_doesNotNotifyWhenTransitionDisallowed() {
         when(mTransitioner.isAllowed(any(Status.class), any(Status.class))).thenReturn(false);
+        // Status values are set to dummy values - Transitioner will disallow all transitions
         when(mRequestStore.getStatus(anyString())).thenReturn(Status.UNKNOWN);
         when(mRequestStore.getRequest(anyString())).thenReturn(dummyRequest());
 
@@ -69,6 +72,7 @@ public class StatusHandlerTest extends AndroidTestCase {
         verify(mStatusBarNotifier, never()).sendStatusBarNotification(any(Request.class));
     }
 
+    @SmallTest
     public void test_updatesStateWhenTransitionAllowed() {
         when(mTransitioner.isAllowed(any(Status.class), any(Status.class))).thenReturn(true);
         when(mRequestStore.getStatus(anyString())).thenReturn(Status.UNKNOWN);
@@ -81,6 +85,7 @@ public class StatusHandlerTest extends AndroidTestCase {
         assertThat(request.getStatus()).isEqualTo(Status.RUNNING);
     }
 
+    @SmallTest
     public void test_doesNotUpdateStateWhenTransitionDisallowed() {
         when(mTransitioner.isAllowed(any(Status.class), any(Status.class))).thenReturn(false);
         when(mRequestStore.getStatus(anyString())).thenReturn(Status.CREATED);
