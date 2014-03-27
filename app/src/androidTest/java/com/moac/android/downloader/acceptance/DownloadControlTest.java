@@ -9,7 +9,6 @@ import com.moac.android.downloader.DemoActivity;
 import com.moac.android.downloader.R;
 import com.robotium.solo.Solo;
 
-
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
@@ -19,6 +18,8 @@ import static org.fest.assertions.api.ANDROID.assertThat;
 
 /*
  * Whitebox UI testing
+ *
+ * TODO Ideally we should have better control over the download duration via mocking
  */
 public class DownloadControlTest extends ActivityInstrumentationTestCase2<DemoActivity> {
 
@@ -56,13 +57,11 @@ public class DownloadControlTest extends ActivityInstrumentationTestCase2<DemoAc
 
         // Click on the first image
         viewGroup1.callOnClick();
-
-        // Wait for indication that it has started to load (requires communication to Service)
-        assertThat(solo.waitForView(R.id.vg_progress_indicator_1));
+        assertVisibilityAfterWait(solo, R.id.vg_progress_indicator_1, View.VISIBLE, 5, TimeUnit.SECONDS);
 
         // Click on the second image
         viewGroup2.callOnClick();
-        assertThat(solo.waitForView(R.id.vg_progress_indicator_2));
+        assertVisibilityAfterWait(solo, R.id.vg_progress_indicator_2, View.VISIBLE, 5, TimeUnit.SECONDS);
 
         assertVisibilityAfterWait(solo, R.id.vg_progress_indicator_1, View.GONE, 20, TimeUnit.SECONDS);
         assertVisibilityAfterWait(solo, R.id.vg_progress_indicator_2, View.GONE, 20, TimeUnit.SECONDS);
