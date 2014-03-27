@@ -28,10 +28,6 @@ public class StatusBarNotifier {
     // TODO Would be nice if we could batch these together for multiple files
     public void sendStatusBarNotification(Request request) {
 
-        // Make this behaviour optional
-        if (mNotificationManager == null)
-            return;
-
         // If we are cancelling the download then cancel any existing notification
         if (request.getStatus() == Status.CANCELLED) {
             if (request.getNotificationId() != Request.UNSET_NOTIFICATION_ID) {

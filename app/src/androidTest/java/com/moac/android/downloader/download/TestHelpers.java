@@ -1,6 +1,6 @@
 package com.moac.android.downloader.download;
 
-public class Dummy {
+public class TestHelpers {
 
     public static Request dummyRequest() {
         return new Request(null, null, null, null, null);

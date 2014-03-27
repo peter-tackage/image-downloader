@@ -9,10 +9,11 @@ import android.test.suitebuilder.annotation.MediumTest;
 import android.test.suitebuilder.annotation.SmallTest;
 
 import com.moac.android.downloader.download.Job;
+import com.moac.android.downloader.download.Request;
 import com.moac.android.downloader.download.RequestExecutor;
 import com.moac.android.downloader.download.RequestStore;
 import com.moac.android.downloader.download.Status;
-import com.moac.android.downloader.download.StatusHandler;
+import com.moac.android.downloader.download.TestHelpers;
 import com.moac.android.downloader.injection.Injector;
 import com.moac.android.downloader.test.MockDemoDownloaderApplication;
 
@@ -20,18 +21,13 @@ import javax.inject.Inject;
 
 import static org.fest.assertions.api.Assertions.assertThat;
 import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.anyString;
-import static org.mockito.Matchers.eq;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
 
 public class DownloadServiceTest extends ServiceTestCase<DownloadService> {
 
     @Inject
     RequestStore mRequestStore;
-
-    @Inject
-    StatusHandler mStatusHandler;
 
     @Inject
     RequestExecutor mRequestExecutor;
@@ -76,7 +72,6 @@ public class DownloadServiceTest extends ServiceTestCase<DownloadService> {
 
     @SmallTest
     public void test_idleDownloadClient() {
-        when(mRequestStore.getStatus(anyString())).thenReturn(Status.UNKNOWN);
 
         Intent startIntent = new Intent();
         startIntent.setClass(getContext(), DownloadService.class);
@@ -85,25 +80,40 @@ public class DownloadServiceTest extends ServiceTestCase<DownloadService> {
 
         DownloadClient client = ((DownloadClient)service);
 
-        assertThat(client.getStatus(anyString())).isEqualTo(Status.UNKNOWN);
+        assertThat(client.getStatus("dummy")).isEqualTo(Status.UNKNOWN);
     }
 
     @MediumTest
     public void test_newDownloadRequest() {
         // Test the first new download -
-        when(mStatusHandler.moveToStatus(anyString(), eq(Status.PENDING))).thenReturn(true);
-        startService(getDummyDownloadIntent(getContext()));
+        startService(getDummyDownloadIntent(getContext(), "trackingId"));
 
+        // Verify that is submitted to the executor
         verify(mRequestExecutor).submit(any(Job.class));
 
+        // Verify request is known by the RequestStore
+        assertThat(mRequestStore.getStatus("trackingId")).isNotEqualTo(Status.UNKNOWN);
+    }
+
+    @MediumTest
+    public void test_rejectRunning() {
+        // Add an existing RUNNING request to the store
+        Request runningRequest = TestHelpers.dummyRequest(Status.RUNNING);
+        mRequestStore.add(runningRequest);
+
+        Intent duplicateDownloadIntent = getDummyDownloadIntent(getContext(), runningRequest.getId());
+        startService(duplicateDownloadIntent);
+
+        // Verify that no request has been submitted to the executor
+        verify(mRequestExecutor, never()).submit(any(Job.class));
     }
 
     // Provides a dummy download intent
     private static Intent getDummyDownloadIntent(Context context) {
-        return getDummyIntent(context, "trackingId");
+        return getDummyDownloadIntent(context, "trackingId");
     }
 
-    private static Intent getDummyIntent(Context context, String trackingId) {
+    private static Intent getDummyDownloadIntent(Context context, String trackingId) {
         Intent startIntent = new Intent();
         startIntent.setClass(context, DownloadService.class);
         startIntent.putExtra(DownloadService.DOWNLOAD_ID, trackingId);

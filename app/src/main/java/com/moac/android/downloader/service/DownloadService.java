@@ -71,7 +71,7 @@ public class DownloadService extends InjectingService {
                     case EXECUTION_COMPLETE:
                         Log.i(TAG, "Execution is complete");
                         boolean isIdle = mRequestExecutor.isIdle();
-                        Log.i(TAG, "RequestExecutor is " + (isIdle ? "IDLE" : "NOT IDLE"));
+                        Log.i(TAG, "RequestExecutor isIdle: " + isIdle);
                         if (isIdle) {
                             // This will not shutdown until the Service is also unbound
                             DownloadService.this.stopSelf();
@@ -94,12 +94,12 @@ public class DownloadService extends InjectingService {
             String remoteLocation = intent.getStringExtra(REMOTE_LOCATION);
             String localLocation = intent.getStringExtra(LOCAL_LOCATION);
             String mediaType = intent.getStringExtra(MEDIA_TYPE);
-            String humanReadableName = intent.getStringExtra(DISPLAY_NAME);
+            String displayName = intent.getStringExtra(DISPLAY_NAME);
 
             Request request = mRequestStore.getRequest(downloadId);
             if (request == null || request.isFinished()) {
                 // If the request doesn't exist, then create it and add to the store
-                request = new Request(downloadId, humanReadableName, Uri.parse(remoteLocation), localLocation, mediaType);
+                request = new Request(downloadId, displayName, Uri.parse(remoteLocation), localLocation, mediaType);
                 mRequestStore.add(request);
                 // Check we are allow to proceed with the request
                 if (mStatusHandler.moveToStatus(downloadId, Status.PENDING)) {
