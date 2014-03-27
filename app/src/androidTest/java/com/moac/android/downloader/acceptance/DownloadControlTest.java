@@ -3,13 +3,11 @@ package com.moac.android.downloader.acceptance;
 import android.test.ActivityInstrumentationTestCase2;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ImageView;
 
 import com.moac.android.downloader.DemoActivity;
 import com.moac.android.downloader.R;
 import com.robotium.solo.Solo;
 
-import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 import static com.moac.android.downloader.test.RobotiumAsserts.assertVisibilityAfterWait;
@@ -21,6 +19,7 @@ import static org.fest.assertions.api.ANDROID.assertThat;
  *
  * TODO Ideally we should have better control over the download duration via mocking
  * TODO The UI doesn't really provide good verification points - you can't determine the download outcome
+ * TODO waitForViewVisibility and make fluent: like assertThat(view).after(10, TU.SECONDS).isNotVisible()
  */
 public class DownloadControlTest extends ActivityInstrumentationTestCase2<DemoActivity> {
 
@@ -82,8 +81,6 @@ public class DownloadControlTest extends ActivityInstrumentationTestCase2<DemoAc
 
         // Verify progress indicator removed once download is complete
         assertVisibilityAfterWait(solo, R.id.vg_progress_indicator_1, View.GONE, DOWNLOAD_DURATION_SEC, TimeUnit.SECONDS);
-
-        // TODO waitForViewVisibility and make fluent
     }
 
     /**
@@ -111,7 +108,6 @@ public class DownloadControlTest extends ActivityInstrumentationTestCase2<DemoAc
 
         // Verify progress indicator removed once download is complete
         assertVisibilityAfterWait(solo, R.id.vg_progress_indicator_1, View.GONE, DOWNLOAD_CANCEL_TIMEOUT_SEC, TimeUnit.SECONDS);
-
     }
 
 }
