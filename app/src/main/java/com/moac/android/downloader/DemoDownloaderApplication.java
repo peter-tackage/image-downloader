@@ -5,7 +5,7 @@ import com.moac.android.downloader.injection.Injector;
 
 import java.util.List;
 
-public class TestDownloaderApplication extends InjectingApplication implements Injector {
+public class DemoDownloaderApplication extends InjectingApplication implements Injector {
 
     @Override
     public List<Object> getModules() {

@@ -9,12 +9,12 @@ import javax.inject.Singleton;
 import dagger.Module;
 import dagger.Provides;
 
-@Module(library = true, injects = TestDownloaderApplication.class)
+@Module(library = true, injects = DemoDownloaderApplication.class)
 public class ApplicationModule {
 
-    private final TestDownloaderApplication application;
+    private final DemoDownloaderApplication application;
 
-    public ApplicationModule(TestDownloaderApplication application) {
+    public ApplicationModule(DemoDownloaderApplication application) {
         this.application = application;
     }
 

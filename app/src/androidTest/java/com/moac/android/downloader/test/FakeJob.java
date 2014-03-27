@@ -10,6 +10,7 @@ import java.util.concurrent.TimeUnit;
 /*
  * A Fake Runnable implementation that performs a download Request
  */
+@Deprecated
 public class FakeJob extends Job {
 
     private static final String TAG = FakeJob.class.getSimpleName();

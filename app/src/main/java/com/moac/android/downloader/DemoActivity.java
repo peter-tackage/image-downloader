@@ -25,7 +25,7 @@ import java.util.HashMap;
 import java.util.UUID;
 
 /*
- * TestActivity to drive the DownloadService
+ * DemoActivity to drive the DownloadService
  *
  * Binds during onResume() to get DownloadClient in order to display
  * the state of any downloads that were previously started.
@@ -47,7 +47,7 @@ import java.util.UUID;
  * TODO Use a GridView and custom compound View to hold the images/overlay
  * TODO Custom view would fire start/cancel events to a listener
  */
-public class TestActivity extends Activity {
+public class DemoActivity extends Activity {
 
     /*
      * Test data
@@ -58,7 +58,6 @@ public class TestActivity extends Activity {
      *
      * (Warning TIF viewing not supported) http://imgsrc.hubblesite.org/hu/db/images/hs-2004-32-d-full_tif.tif
      *
-     *
      */
     private static final String TRACKING_ID_1 = "imageId1";
     private static final String TRACKING_ID_2 = "imageId2";
@@ -68,7 +67,7 @@ public class TestActivity extends Activity {
         FAKE_DATASOURCE.put(TRACKING_ID_2, Uri.parse("http://upload.wikimedia.org/wikipedia/commons/5/57/ECurtis.jpg"));
     }
 
-    private static final String TAG = TestActivity.class.getSimpleName();
+    private static final String TAG = DemoActivity.class.getSimpleName();
 
     // Direct interface to the Service
     private DownloadClient mDownloadClient;
@@ -109,7 +108,7 @@ public class TestActivity extends Activity {
                 Status status = mDownloadClient.getStatus(trackingId);
                 if (status == Status.UNKNOWN || status.ordinal() >= Status.CANCELLED.ordinal()) {
                     // Create the start intent
-                    Intent i = new Intent(TestActivity.this, DownloadService.class);
+                    Intent i = new Intent(DemoActivity.this, DownloadService.class);
                     i.putExtra(DownloadService.DOWNLOAD_ID, trackingId);
                     i.putExtra(DownloadService.REMOTE_LOCATION, uri.toString());
                     String destinationFilename = generateUniqueTestFilename();

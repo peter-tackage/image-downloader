@@ -15,6 +15,7 @@ import java.util.concurrent.TimeUnit;
  * <p/>
  * Returns an empty input stream
  */
+@Deprecated
 public class FakeDownloader implements Downloader {
 
     private static final String TAG = FakeDownloader.class.getSimpleName();
