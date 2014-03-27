@@ -1,5 +1,6 @@
 package com.moac.android.downloader.download;
 
+import android.app.Notification;
 import android.app.NotificationManager;
 import android.test.AndroidTestCase;
 import android.test.suitebuilder.annotation.SmallTest;
@@ -8,13 +9,11 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
 import static com.moac.android.downloader.download.TestHelpers.dummyRequest;
-import static org.fest.assertions.api.Assertions.assertThat;
 import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.anyString;
+import static org.mockito.Matchers.anyInt;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
 
 public class StatusBarNotifierTest extends AndroidTestCase {
 
@@ -22,7 +21,7 @@ public class StatusBarNotifierTest extends AndroidTestCase {
     NotificationManager mNotificationManager;
 
     // SUT
-    private StatusBarNotifier mStatusBarNotifier;
+    StatusBarNotifier mStatusBarNotifier;
 
     @Override
     public void setUp() throws Exception {
@@ -41,7 +40,7 @@ public class StatusBarNotifierTest extends AndroidTestCase {
     }
 
     @SmallTest
-    public void test_sendCancelledNotification() {
+    public void test_cancelNotification() {
         Request r = dummyRequest(Status.CANCELLED);
         r.setNotificationId(1);
 
@@ -50,5 +49,24 @@ public class StatusBarNotifierTest extends AndroidTestCase {
         verify(mNotificationManager).cancel(r.getNotificationId());
     }
 
+    @SmallTest
+    public void test_sendPendingNotification() {
+        Request r = dummyRequest(Status.PENDING);
+        r.setNotificationId(1);
+
+        mStatusBarNotifier.sendStatusBarNotification(r);
+
+        verify(mNotificationManager).notify(eq(r.getNotificationId()), any(Notification.class));
+    }
+
+    @SmallTest
+    public void test_neverSendRunningNotification() {
+        Request r = dummyRequest(Status.RUNNING);
+        r.setNotificationId(1);
+
+        mStatusBarNotifier.sendStatusBarNotification(r);
+        // We don't send a specific notification for RUNNING
+        verify(mNotificationManager, never()).notify(anyInt(), any(Notification.class));
+    }
 }
 
