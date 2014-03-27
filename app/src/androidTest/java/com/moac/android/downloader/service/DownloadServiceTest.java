@@ -14,7 +14,7 @@ import com.moac.android.downloader.download.RequestStore;
 import com.moac.android.downloader.download.Status;
 import com.moac.android.downloader.download.StatusHandler;
 import com.moac.android.downloader.injection.Injector;
-import com.moac.android.downloader.test.MockTestDownloaderApplication;
+import com.moac.android.downloader.test.MockDemoDownloaderApplication;
 
 import javax.inject.Inject;
 
@@ -47,7 +47,7 @@ public class DownloadServiceTest extends ServiceTestCase<DownloadService> {
         System.setProperty("dexmaker.dexcache", getContext().getCacheDir().getPath());
 
         // Provide injections into application for the service
-        Application app = new MockTestDownloaderApplication();
+        Application app = new MockDemoDownloaderApplication();
         app.onCreate();
         setApplication(app);
 

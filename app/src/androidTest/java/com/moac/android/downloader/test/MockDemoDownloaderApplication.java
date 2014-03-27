@@ -9,7 +9,7 @@ import java.util.List;
 
 import dagger.ObjectGraph;
 
-public class MockTestDownloaderApplication extends MockApplication implements Injector {
+public class MockDemoDownloaderApplication extends MockApplication implements Injector {
 
     private ObjectGraph mObjectGraph;
 
