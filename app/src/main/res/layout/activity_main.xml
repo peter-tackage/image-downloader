@@ -22,7 +22,7 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:background="#AA000000"
-            android:visibility="visible"
+            android:visibility="gone"
             android:layout_gravity="center">
 
             <ProgressBar
@@ -37,7 +37,7 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Tap to cancel"
+                android:text="@string/tap_to_cancel"
                 android:textColor="@android:color/white"
                 android:layout_below="@+id/pb_downloading_1"
                 android:layout_centerHorizontal="true" />
@@ -63,7 +63,7 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:background="#AA000000"
-            android:visibility="visible"
+            android:visibility="gone"
             android:layout_gravity="center">
 
             <ProgressBar
@@ -78,7 +78,7 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Tap to cancel"
+                android:text="@string/tap_to_cancel"
                 android:textColor="@android:color/white"
                 android:layout_below="@+id/pb_downloading_2"
                 android:layout_centerHorizontal="true" />

@@ -1,5 +1,6 @@
 package com.moac.android.downloader.test;
 
+
 import com.robotium.solo.Condition;
 import com.robotium.solo.Solo;
 

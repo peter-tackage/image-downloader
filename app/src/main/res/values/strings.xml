@@ -5,4 +5,5 @@
     <string name="notification_ticker_status_failed">Media download failed</string>
     <string name="notification_title_status_failed">Download failed</string>
     <string name="notification_title_successful">Download complete</string>
+    <string name="tap_to_cancel">Tap to cancel</string>
 </resources>

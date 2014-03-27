@@ -20,12 +20,15 @@ import static org.fest.assertions.api.ANDROID.assertThat;
  * Whitebox UI testing
  *
  * TODO Ideally we should have better control over the download duration via mocking
+ * TODO The UI doesn't really provide good verification points - you can't determine the download outcome
  */
 public class DownloadControlTest extends ActivityInstrumentationTestCase2<DemoActivity> {
 
+    private static final int DOWNLOAD_DURATION_SEC = 20;
+    private static final int DOWNLOAD_CANCEL_TIMEOUT_SEC = 1;
+
     private Solo solo;
 
-    @SuppressWarnings("unchecked")
     public DownloadControlTest() throws ClassNotFoundException {
         super(DemoActivity.class);
     }
@@ -33,6 +36,7 @@ public class DownloadControlTest extends ActivityInstrumentationTestCase2<DemoAc
     @Override
     public void setUp() throws Exception {
         solo = new Solo(getInstrumentation(), getActivity());
+        solo.waitForActivity(DemoActivity.class);
     }
 
     @Override
@@ -41,30 +45,43 @@ public class DownloadControlTest extends ActivityInstrumentationTestCase2<DemoAc
     }
 
     /**
+     * Verify the action bar contents
+     * This is a pretty pointless test as the ActionBar is mostly empty
+     */
+    public void test_actionBar() {
+        // Check that we have the right activity under test
+        solo.assertCurrentActivity("Incorrect Activity", DemoActivity.class);
+
+        // Verify the app name and icon are in the Action bar
+        assertThat(solo.getText(getInstrumentation().getTargetContext().getString(R.string.app_name))).isVisible();
+        assertThat(solo.getView(android.R.id.home)).isVisible().isNotClickable();
+    }
+
+    /**
      * Verify the UI removes the progress dialog once downloads have completed
      */
-    public void test_downloadsComplete() throws Exception {
+    public void test_successfulDownload() throws Exception {
 
         // Check that we have the right activity under test
         solo.assertCurrentActivity("Incorrect Activity", DemoActivity.class);
 
-        // Check we have the expected image containers
-        List<ImageView> imageContainers = solo.getCurrentViews(ImageView.class);
+        // Get the image container
         ViewGroup viewGroup1 = (ViewGroup)solo.getView(R.id.vg_demo_pic1);
-        ViewGroup viewGroup2 = (ViewGroup)solo.getView(R.id.vg_demo_pic2);
+
+        // Verify an image is visible and progress indicator not visible
         assertThat(viewGroup1).isVisible();
-        assertThat(viewGroup2).isVisible();
+        assertThat(solo.getView(R.id.vg_progress_indicator_1)).isNotVisible();
 
-        // Click on the first image
+        // Click on the image to start downloading
         viewGroup1.callOnClick();
-        assertVisibilityAfterWait(solo, R.id.vg_progress_indicator_1, View.VISIBLE, 5, TimeUnit.SECONDS);
 
-        // Click on the second image
-        viewGroup2.callOnClick();
-        assertVisibilityAfterWait(solo, R.id.vg_progress_indicator_2, View.VISIBLE, 5, TimeUnit.SECONDS);
+        // Verify the image's progress indicator is shown
+        assertThat(solo.waitForView(R.id.vg_progress_indicator_1));
+        assertThat(solo.getView(R.id.vg_progress_indicator_1)).isVisible();
+        assertThat(solo.searchText(getInstrumentation().getTargetContext().getString(R.string.tap_to_cancel)));
 
-        assertVisibilityAfterWait(solo, R.id.vg_progress_indicator_1, View.GONE, 20, TimeUnit.SECONDS);
-        assertVisibilityAfterWait(solo, R.id.vg_progress_indicator_2, View.GONE, 20, TimeUnit.SECONDS);
+        // Verify progress indicator removed once download is complete
+        assertVisibilityAfterWait(solo, R.id.vg_progress_indicator_1, View.GONE, DOWNLOAD_DURATION_SEC, TimeUnit.SECONDS);
 
         // TODO waitForViewVisibility and make fluent
     }
@@ -72,34 +89,28 @@ public class DownloadControlTest extends ActivityInstrumentationTestCase2<DemoAc
     /**
      * Verify the UI removes the progress dialog once downloads have been cancelled
      */
-    public void test_downloadsCancel() throws Exception {
+    public void test_cancelledDownload() throws Exception {
 
-        // Check that we have the right activity under test
-        solo.assertCurrentActivity("Incorrect Activity", DemoActivity.class);
-
-        // Check we have the expected image containers
-        List<ImageView> imageContainers = solo.getCurrentViews(ImageView.class);
+        // Get the image container
         ViewGroup viewGroup1 = (ViewGroup)solo.getView(R.id.vg_demo_pic1);
-        ViewGroup viewGroup2 = (ViewGroup)solo.getView(R.id.vg_demo_pic2);
+
+        // Verify an image is visible and progress indicator not visible
         assertThat(viewGroup1).isVisible();
-        assertThat(viewGroup2).isVisible();
+        assertThat(solo.getView(R.id.vg_progress_indicator_1)).isNotVisible();
 
-        // Click on the first image
+        // Click on the image to start downloading
         viewGroup1.callOnClick();
 
-        // Wait for indication that it has started to load (requires communication to Service)
+        // Verify the image's progress indicator is shown
         assertThat(solo.waitForView(R.id.vg_progress_indicator_1));
+        assertThat(solo.getView(R.id.vg_progress_indicator_1)).isVisible();
+        assertThat(solo.searchText(getInstrumentation().getTargetContext().getString(R.string.tap_to_cancel)));
 
-        // Click on the second image
-        viewGroup2.callOnClick();
-        assertThat(solo.waitForView(R.id.vg_progress_indicator_2));
-
-        // Cancel the downloads by reclicking the image container
+        // Click on the image to cancel downloading
         viewGroup1.callOnClick();
-        viewGroup2.callOnClick();
 
-        assertVisibilityAfterWait(solo, R.id.vg_progress_indicator_1, View.GONE, 1, TimeUnit.SECONDS);
-        assertVisibilityAfterWait(solo, R.id.vg_progress_indicator_2, View.GONE, 1, TimeUnit.SECONDS);
+        // Verify progress indicator removed once download is complete
+        assertVisibilityAfterWait(solo, R.id.vg_progress_indicator_1, View.GONE, DOWNLOAD_CANCEL_TIMEOUT_SEC, TimeUnit.SECONDS);
 
     }
 
