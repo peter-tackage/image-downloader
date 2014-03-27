@@ -72,7 +72,7 @@ public class DownloadControlTest extends ActivityInstrumentationTestCase2<DemoAc
         assertThat(solo.getView(R.id.vg_progress_indicator_1)).isNotVisible();
 
         // Click on the image to start downloading
-        viewGroup1.callOnClick();
+        solo.clickOnView(viewGroup1);
 
         // Verify the image's progress indicator is shown
         assertThat(solo.waitForView(R.id.vg_progress_indicator_1));
@@ -96,7 +96,7 @@ public class DownloadControlTest extends ActivityInstrumentationTestCase2<DemoAc
         assertThat(solo.getView(R.id.vg_progress_indicator_1)).isNotVisible();
 
         // Click on the image to start downloading
-        viewGroup1.callOnClick();
+        solo.clickOnView(viewGroup1);
 
         // Verify the image's progress indicator is shown
         assertThat(solo.waitForView(R.id.vg_progress_indicator_1));
@@ -104,7 +104,7 @@ public class DownloadControlTest extends ActivityInstrumentationTestCase2<DemoAc
         assertThat(solo.searchText(getInstrumentation().getTargetContext().getString(R.string.tap_to_cancel)));
 
         // Click on the image to cancel downloading
-        viewGroup1.callOnClick();
+        solo.clickOnView(viewGroup1);
 
         // Verify progress indicator removed once download is complete
         assertVisibilityAfterWait(solo, R.id.vg_progress_indicator_1, View.GONE, DOWNLOAD_CANCEL_TIMEOUT_SEC, TimeUnit.SECONDS);
