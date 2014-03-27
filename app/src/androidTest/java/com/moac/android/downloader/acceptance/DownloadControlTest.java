@@ -40,9 +40,9 @@ public class DownloadControlTest extends ActivityInstrumentationTestCase2<DemoAc
     }
 
     /**
-     * Verify the Group List contains a default created Group
+     * Verify the UI removes the progress dialog once downloads have completed
      */
-    public void testGroupManagementAcceptance() throws Exception {
+    public void test_downloadsComplete() throws Exception {
 
         // Check that we have the right activity under test
         solo.assertCurrentActivity("Incorrect Activity", DemoActivity.class);
@@ -68,6 +68,40 @@ public class DownloadControlTest extends ActivityInstrumentationTestCase2<DemoAc
         assertVisibilityAfterWait(solo, R.id.vg_progress_indicator_2, View.GONE, 20, TimeUnit.SECONDS);
 
         // TODO waitForViewVisibility and make fluent
+    }
+
+    /**
+     * Verify the UI removes the progress dialog once downloads have been cancelled
+     */
+    public void test_downloadsCancel() throws Exception {
+
+        // Check that we have the right activity under test
+        solo.assertCurrentActivity("Incorrect Activity", DemoActivity.class);
+
+        // Check we have the expected image containers
+        List<ImageView> imageContainers = solo.getCurrentViews(ImageView.class);
+        ViewGroup viewGroup1 = (ViewGroup)solo.getView(R.id.vg_demo_pic1);
+        ViewGroup viewGroup2 = (ViewGroup)solo.getView(R.id.vg_demo_pic2);
+        assertThat(viewGroup1).isVisible();
+        assertThat(viewGroup2).isVisible();
+
+        // Click on the first image
+        viewGroup1.callOnClick();
+
+        // Wait for indication that it has started to load (requires communication to Service)
+        assertThat(solo.waitForView(R.id.vg_progress_indicator_1));
+
+        // Click on the second image
+        viewGroup2.callOnClick();
+        assertThat(solo.waitForView(R.id.vg_progress_indicator_2));
+
+        // Cancel the downloads by reclicking the image container
+        viewGroup1.callOnClick();
+        viewGroup2.callOnClick();
+
+        assertVisibilityAfterWait(solo, R.id.vg_progress_indicator_1, View.GONE, 1, TimeUnit.SECONDS);
+        assertVisibilityAfterWait(solo, R.id.vg_progress_indicator_2, View.GONE, 1, TimeUnit.SECONDS);
+
     }
 
 }
