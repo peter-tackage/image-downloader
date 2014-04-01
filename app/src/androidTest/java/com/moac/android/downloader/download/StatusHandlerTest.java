@@ -61,8 +61,8 @@ public class StatusHandlerTest extends AndroidTestCase {
 
     @SmallTest
     public void test_doesNotNotifyWhenTransitionDisallowed() {
-        when(mTransitioner.isAllowed(any(Status.class), any(Status.class))).thenReturn(false);
         // Status values are set to dummy values - Transitioner will disallow all transitions
+        when(mTransitioner.isAllowed(any(Status.class), any(Status.class))).thenReturn(false);
         when(mRequestStore.getStatus(anyString())).thenReturn(Status.UNKNOWN);
         when(mRequestStore.getRequest(anyString())).thenReturn(dummyRequest());
 
@@ -74,9 +74,9 @@ public class StatusHandlerTest extends AndroidTestCase {
 
     @SmallTest
     public void test_updatesStateWhenTransitionAllowed() {
+        Request request = dummyRequest(Status.CREATED);
         when(mTransitioner.isAllowed(any(Status.class), any(Status.class))).thenReturn(true);
         when(mRequestStore.getStatus(anyString())).thenReturn(Status.UNKNOWN);
-        Request request = dummyRequest(Status.CREATED);
         when(mRequestStore.getRequest(anyString())).thenReturn(request);
 
         mStatusHandler.moveToStatus("dummy", Status.RUNNING);
@@ -87,9 +87,9 @@ public class StatusHandlerTest extends AndroidTestCase {
 
     @SmallTest
     public void test_doesNotUpdateStateWhenTransitionDisallowed() {
+        Request request = dummyRequest(Status.CREATED);
         when(mTransitioner.isAllowed(any(Status.class), any(Status.class))).thenReturn(false);
         when(mRequestStore.getStatus(anyString())).thenReturn(Status.CREATED);
-        Request request = dummyRequest(Status.CREATED);
         when(mRequestStore.getRequest(anyString())).thenReturn(request);
 
         mStatusHandler.moveToStatus("dummy", Status.RUNNING);

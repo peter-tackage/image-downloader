@@ -51,6 +51,13 @@ public class DownloadServiceTest extends ServiceTestCase<DownloadService> {
         ((Injector) (getApplication())).getObjectGraph().inject(this);
     }
 
+    @Override
+    public void tearDown() throws Exception {
+        super.tearDown();
+        mRequestStore = null;
+        mRequestExecutor = null;
+    }
+
     /**
      * Test basic startup
      */

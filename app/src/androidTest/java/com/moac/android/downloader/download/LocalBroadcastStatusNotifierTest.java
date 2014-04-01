@@ -35,6 +35,7 @@ public class LocalBroadcastStatusNotifierTest extends AndroidTestCase {
     @Override
     public void tearDown() throws Exception {
         super.tearDown();
+        mLocalBroadcastManager = null;
         mStatusNotifer = null;
     }
 

@@ -10,7 +10,7 @@ import com.robotium.solo.Solo;
 
 import java.util.concurrent.TimeUnit;
 
-import static com.moac.android.downloader.test.RobotiumAsserts.assertVisibilityAfterWait;
+import static com.moac.android.downloader.test.RobotiumAsserts.assertVisibility;
 import static org.fest.assertions.api.Assertions.assertThat;
 import static org.fest.assertions.api.ANDROID.assertThat;
 
@@ -80,7 +80,7 @@ public class DownloadControlTest extends ActivityInstrumentationTestCase2<DemoAc
         assertThat(solo.searchText(getInstrumentation().getTargetContext().getString(R.string.tap_to_cancel)));
 
         // Verify progress indicator removed once download is complete
-        assertVisibilityAfterWait(solo, R.id.vg_progress_indicator_1, View.GONE, DOWNLOAD_DURATION_SEC, TimeUnit.SECONDS);
+        assertVisibility(solo, R.id.vg_progress_indicator_1, View.GONE, DOWNLOAD_DURATION_SEC, TimeUnit.SECONDS);
     }
 
     /**
@@ -107,7 +107,7 @@ public class DownloadControlTest extends ActivityInstrumentationTestCase2<DemoAc
         solo.clickOnView(viewGroup1);
 
         // Verify progress indicator removed once download is complete
-        assertVisibilityAfterWait(solo, R.id.vg_progress_indicator_1, View.GONE, DOWNLOAD_CANCEL_TIMEOUT_SEC, TimeUnit.SECONDS);
+        assertVisibility(solo, R.id.vg_progress_indicator_1, View.GONE, DOWNLOAD_CANCEL_TIMEOUT_SEC, TimeUnit.SECONDS);
     }
 
 }
