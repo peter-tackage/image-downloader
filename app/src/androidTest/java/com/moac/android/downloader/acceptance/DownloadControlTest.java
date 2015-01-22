@@ -11,8 +11,7 @@ import com.robotium.solo.Solo;
 import java.util.concurrent.TimeUnit;
 
 import static com.moac.android.downloader.test.RobotiumAsserts.assertVisibility;
-import static org.fest.assertions.api.Assertions.assertThat;
-import static org.fest.assertions.api.ANDROID.assertThat;
+import static org.assertj.android.api.Assertions.assertThat;
 
 /*
  * Whitebox UI testing
@@ -75,9 +74,9 @@ public class DownloadControlTest extends ActivityInstrumentationTestCase2<DemoAc
         solo.clickOnView(viewGroup1);
 
         // Verify the image's progress indicator is shown
-        assertThat(solo.waitForView(R.id.vg_progress_indicator_1));
+        assertTrue(solo.waitForView(R.id.vg_progress_indicator_1));
         assertThat(solo.getView(R.id.vg_progress_indicator_1)).isVisible();
-        assertThat(solo.searchText(getInstrumentation().getTargetContext().getString(R.string.tap_to_cancel)));
+        assertTrue(solo.searchText(getInstrumentation().getTargetContext().getString(R.string.tap_to_cancel)));
 
         // Verify progress indicator removed once download is complete
         assertVisibility(solo, R.id.vg_progress_indicator_1, View.GONE, DOWNLOAD_DURATION_SEC, TimeUnit.SECONDS);
@@ -99,9 +98,9 @@ public class DownloadControlTest extends ActivityInstrumentationTestCase2<DemoAc
         solo.clickOnView(viewGroup1);
 
         // Verify the image's progress indicator is shown
-        assertThat(solo.waitForView(R.id.vg_progress_indicator_1));
+        assertTrue(solo.waitForView(R.id.vg_progress_indicator_1));
         assertThat(solo.getView(R.id.vg_progress_indicator_1)).isVisible();
-        assertThat(solo.searchText(getInstrumentation().getTargetContext().getString(R.string.tap_to_cancel)));
+        assertTrue(solo.searchText(getInstrumentation().getTargetContext().getString(R.string.tap_to_cancel)));
 
         // Click on the image to cancel downloading
         solo.clickOnView(viewGroup1);

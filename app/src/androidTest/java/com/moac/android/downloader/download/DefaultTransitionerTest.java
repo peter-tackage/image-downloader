@@ -3,7 +3,7 @@ package com.moac.android.downloader.download;
 import android.test.AndroidTestCase;
 import android.test.suitebuilder.annotation.SmallTest;
 
-import static org.fest.assertions.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThat;
 
 public class DefaultTransitionerTest extends AndroidTestCase {
 

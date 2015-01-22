@@ -20,6 +20,12 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.txt'
         }
     }
+
+    packagingOptions {
+        exclude 'LICENSE'
+        exclude 'NOTICE'
+        exclude 'asm-license.txt'
+    }
 }
 
 dependencies {
