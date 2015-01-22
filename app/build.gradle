@@ -1,8 +1,8 @@
 apply plugin: 'com.android.application'
 
 android {
-    compileSdkVersion 20
-    buildToolsVersion "20.0.0"
+    compileSdkVersion 21
+    buildToolsVersion "21.1.1"
     compileOptions {
         sourceCompatibility JavaVersion.VERSION_1_7
         targetCompatibility JavaVersion.VERSION_1_7
@@ -10,13 +10,13 @@ android {
 
     defaultConfig {
         minSdkVersion 15
-        targetSdkVersion 20
+        targetSdkVersion 21
         versionCode 1
         versionName "1.0"
     }
     buildTypes {
         release {
-            runProguard false
+            minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.txt'
         }
     }
@@ -25,13 +25,11 @@ android {
 dependencies {
     compile 'com.squareup.dagger:dagger:1.2.0'
     compile 'com.squareup.dagger:dagger-compiler:1.2.0'
-    compile 'com.android.support:support-v13:19.0.1'
+    compile 'com.android.support:support-v13:21.0.3'
 
     androidTestCompile 'com.jayway.android.robotium:robotium-solo:5.1'
     androidTestCompile 'org.mockito:mockito-core:1.9.5'
     androidTestCompile 'com.google.dexmaker:dexmaker:1.0'
     androidTestCompile 'com.google.dexmaker:dexmaker-mockito:1.0'
-    androidTestCompile 'com.squareup:fest-android:1.0.7'
-    // Import of android assert broken - https://github.com/square/assertj-android/issues/129
-   //  androidTestCompile 'com.squareup.assertj:assertj-android:1.0.0'
+    androidTestCompile 'com.squareup.assertj:assertj-android:1.0.0'
 }
